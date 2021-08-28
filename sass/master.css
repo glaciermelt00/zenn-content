@@ -1,0 +1,31 @@
+.tag {
+  display: inline-block;
+  font-size: 15px;
+  color: #000;
+  font-weight: bold;
+  padding: 5px 20px;
+}
+
+.list {
+  text-align: center;
+}
+.list > li {
+  display: inline-block;
+  margin: 0 10px;
+}
+
+.button {
+  display: inline-block;
+  text-align: center;
+  text-decoration: none;
+  padding: 5px 30px;
+  font-size: 15px;
+  border-radius: 5px;
+  background-color: #000;
+}
+.button.button-primary {
+  background-color: #12bd00;
+}
+.button.button-secondary {
+  background-color: #00a9c7;
+}
