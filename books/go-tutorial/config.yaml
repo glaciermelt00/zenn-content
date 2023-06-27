@@ -1,0 +1,8 @@
+title: "Go プログラミングノート"
+summary: "Go を学習するに当たり学んだことを記述していく"
+topics: ["go", "golang", "tutorial"] # トピック（5つまで）
+published: true # falseだと下書き
+price: 0 # 有料の場合200〜5000
+chapters:
+  - memo # メモ
+
