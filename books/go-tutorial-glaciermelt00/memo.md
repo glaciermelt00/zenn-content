@@ -28,7 +28,7 @@ title: "メモ"
 - 新規モジュールの要件・サムの追加
     
     ```bash
-    	$ go mod tidy
+    $ go mod tidy
     ```
     
 
@@ -122,7 +122,7 @@ title: "メモ"
     - `go mod edit -replace` を使う
         
         ```go
-        	$ go mod edit -replace example.com/greetings=../greetings
+        $ go mod edit -replace example.com/greetings=../greetings
         ```
         
         - `../greetings` ディレクトリに存在する `[example.com/greetings](http://example.com/greetings)` モジュールを使用するため、依存関係を指定する
