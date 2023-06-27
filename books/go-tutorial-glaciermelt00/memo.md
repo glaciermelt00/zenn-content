@@ -84,6 +84,12 @@ title: "メモ"
 - `func randomFormat() string { ... }`
     - 関数名が小文字で始まる場合、独自のパッケージ内からしかアクセスできない
         - つまり、エクスポートされない
+- `for _, name := range names { ... }`
+    - スライスから value を取り出して for ループを回す
+- `messages[name] = message`
+    - マップでキーと値を関連づける
+- `names := []string{"A", "B", "C"}`
+    - スライスの変数を作成
 
 # パッケージ系
 
@@ -152,4 +158,7 @@ title: "メモ"
     - `[]string`
     - 配列に似ている
     - 要素の追加・削除で、サイズが動的に変化する
+- マップ
+    - `map[KeyType]ValueType`
+    - 初期化：　make 関数を使う：　`make(map[string]int)`
 
