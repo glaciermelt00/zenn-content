@@ -86,10 +86,9 @@ title: "メモ"
         - つまり、エクスポートされない
 - `for _, name := range names { ... }`
     - スライスから value を取り出して for ループを回す
-- `messages[name] = message`
-    - マップでキーと値を関連づける
-- `names := []string{"A", "B", "C"}`
-    - スライスの変数を作成
+- `want := regexp.MustCompile(`\b`+name+`\b`)`
+    - 正規表現をコンパイルする
+    - name というパターンのみマッチさせる
 
 # パッケージ系
 
@@ -99,6 +98,9 @@ title: "メモ"
         - オペランドの間には常にスペースが追加され、改行が追加される
         - 書き込まれたバイト数と、発生した書き込みエラーを返す
     - `Sprintf` 関数：　フォーマット指定子に従ってフォーマットし、結果を返す
+    - `%v`：　構造体を出力するときのデフォルトフォーマットの値
+    - `%q` (文字列とバイトのスライス)：　Go 構文で安全にエスケープされた二重引用符で囲まれた文字列
+    - `%#q`：　バッククォートされた文字列
 - `quote` パッケージ
     - https://pkg.go.dev/rsc.io/quote/v4#Go
     - `Go` 関数：　Go のことわざを返す
@@ -121,6 +123,14 @@ title: "メモ"
     - https://pkg.go.dev/math/rand
     - `Intn` 関数：　`int` として、非負の擬似ランダムな数を返す：　デフォルトの Source から半開区間 `[0, n)` で
         - n が 0以下の場合、パニックになる
+- `testing` パッケージ
+    - `T` 型：　テスト状態を管理し、フォーマットされたテストログをサポートするために、テスト関数に渡される型
+        - `Fatalf` 関数：　`Logf` の後に `FailNow` が続くものと同等
+- `regexp` パッケージ
+    - `MustCompile(str string) *Regexp` 関数：　Compile に似ているが、式を解析できない場合にパニックを起こす
+        - これにより、コンパイルされた正規表現を保持するグローバル変数の安全な初期化が簡素化される
+    - `MatchString` 関数：　文字列 s に正規表現パターンの一致が含まれているかどうかを報告する
+
 
 # モジュール系
 
@@ -151,6 +161,9 @@ title: "メモ"
             require example.com/greetings v0.0.0-00010101000000-000000000000
             ```
             
+- `go build`：　パッケージとその依存関係をコンパイルする
+- `go install`：　パッケージをコンパイルしてsインストールする
+- `go list -f '{{.Target}}'`：　ビルドされたパッケージの場所を表示する
 
 # 型
 
@@ -158,7 +171,41 @@ title: "メモ"
     - `[]string`
     - 配列に似ている
     - 要素の追加・削除で、サイズが動的に変化する
+    - スライスの変数を作成：　`names := []string{"A", "B", "C"}`
 - マップ
     - `map[KeyType]ValueType`
-    - 初期化：　make 関数を使う：　`make(map[string]int)`
+    - 初期化：　make 関数を使う
+        - `make(map[string]int)`
+    - マップでキーと値を関連づける
+        - `messages[name] = message`
+
+# テスト系
+
+- `AAA_test.go`
+    - ファイル末尾に `_test.go` がある場合、 `go test` コマンドはそのファイルにテスト関数が含まれると判断する
+- `func TestName(t *testing.T) { ... }`
+    - テスト関数の頭には `Test` をつける
+    - `testing` パッケージの `testing.T` 型へのポインタをパラメータとして受け取る
+    - このパラメータのメソッドを使用して、テストからのレポートとログを記録する
+- `go test`
+    - テストを実行する
+        
+        ```bash
+        $ go test
+        PASS
+        ok      example.com/greetings   0.591s
+        ```
+        
+    - すべてのテストとその結果をリストする詳細な出力を取得する
+        
+        ```bash
+        $ go test -v
+        === RUN   TestHelloName
+        --- PASS: TestHelloName (0.00s)
+        === RUN   TestHelloEmpty
+        --- PASS: TestHelloEmpty (0.00s)
+        PASS
+        ok      example.com/greetings   0.125s
+        ```
+        
 
