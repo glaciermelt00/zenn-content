@@ -121,6 +121,9 @@ title: "メモ"
     - https://pkg.go.dev/math/rand
     - `Intn` 関数：　`int` として、非負の擬似ランダムな数を返す：　デフォルトの Source から半開区間 `[0, n)` で
         - n が 0以下の場合、パニックになる
+- `testing` パッケージ
+    - `T` 型：　テスト状態を管理し、フォーマットされたテストログをサポートするために、テスト関数に渡される型
+        - `Fatalf` 関数：　`Logf` の後に `FailNow` が続くものと同等
 
 # モジュール系
 
@@ -162,3 +165,11 @@ title: "メモ"
     - `map[KeyType]ValueType`
     - 初期化：　make 関数を使う：　`make(map[string]int)`
 
+# テスト系
+
+- `AAA_test.go`
+    - ファイル末尾に `_test.go` がある場合、 `go test` コマンドはそのファイルにテスト関数が含まれると判断する
+- `func TestName(t *testing.T) { ... }`
+    - テスト関数の頭には `Test` をつける
+    - `testing` パッケージの `testing.T` 型へのポインタをパラメータとして受け取る
+    - このパラメータのメソッドを使用して、テストからのレポートとログを記録する
