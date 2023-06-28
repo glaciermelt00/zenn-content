@@ -25,12 +25,50 @@ title: "メモ"
     $ go run .
     ```
     
+    - モジュールを指定して実行：　example/hello モジュールを指定
+        
+        ```bash
+        $ go run example/hello
+        ```
+        
 - 新規モジュールの要件・サムの追加
     
     ```bash
     $ go mod tidy
     ```
     
+- 依存関係の追加
+    
+    ```bash
+    $ go get golang.org/x/example
+    go: downloading golang.org/x/example v0.0.0-20230515183114-5bec75697667
+    go: added golang.org/x/example v0.0.0-20230515183114-5bec75697667
+    ```
+    - `golang.org/x/example` モジュールに依存関係を追加
+- ワークスペースの初期化
+    
+    ```bash
+    $ go work init ./hello
+    ```
+    
+    - `./hello` ディレクトリを含むワークスペースを初期化
+    - 以下のような `go.work` ファイルが生成される
+        
+        ```go
+        go 1.20
+        
+        use ./hello
+        ```
+        
+        - `go` ディレクティブ：　ファイルを解釈する Go のバージョンを Go に指示する
+        - `use` ディレクティブ：　ビルドを実行するときに ./hello ディレクトリ内のモジュールがメインモジュールである必要があることを Go に指示する
+- ワークスペースにモジュールを追加
+    
+    ```bash
+    $ go work use ./example
+    ```
+    
+    - `./example` モジュールをワークスペースに追加
 
 # コーディング系
 
@@ -130,6 +168,9 @@ title: "メモ"
     - `MustCompile(str string) *Regexp` 関数：　Compile に似ているが、式を解析できない場合にパニックを起こす
         - これにより、コンパイルされた正規表現を保持するグローバル変数の安全な初期化が簡素化される
     - `MatchString` 関数：　文字列 s に正規表現パターンの一致が含まれているかどうかを報告する
+- `unicode` パッケージ
+    - https://pkg.go.dev/unicode
+    - `ToUpper` 関数：　rune を大文字にマップする
 
 
 # モジュール系
@@ -178,6 +219,10 @@ title: "メモ"
         - `make(map[string]int)`
     - マップでキーと値を関連づける
         - `messages[name] = message`
+- ルーン
+    - `type rune = int32`
+    - rune は int32 のエイリアスであり、あらゆる点で int32 と同等
+    - 慣例により、文字値と整数値を区別するために使用される
 
 # テスト系
 
