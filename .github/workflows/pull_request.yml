@@ -3,6 +3,7 @@ on:
     types: [opened]
 permissions:
   pull-requests: write
+  repository-projects: read
 name: Pull Request
 jobs:
   assignAuthor:
