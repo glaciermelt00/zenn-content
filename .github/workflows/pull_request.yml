@@ -2,7 +2,10 @@ on:
   pull_request:
     types: [opened]
 name: Pull Request
-permissions: write-all
+permissions:
+  issues: write
+  pull-requests: write
+  repository-projects: read
 jobs:
   assignAuthor:
     name: Assign author to PR
