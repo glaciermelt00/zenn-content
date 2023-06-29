@@ -10,15 +10,6 @@ title: "メモ"
     $ go version
     ```
     
-- 依存性追跡の有効化
-    
-    ```bash
-    $ go mod init <prefix>/<descriptive-text>
-    ```
-    
-    - prefix: モジュールを部分的に説明する文字列
-    - descriptive-text: プロジェクト名
-        - https://go.dev/doc/modules/managing-dependencies#naming_module
 - コードの実行
     
     ```bash
@@ -31,20 +22,6 @@ title: "メモ"
         $ go run example/hello
         ```
         
-- 新規モジュールの要件・サムの追加
-    
-    ```bash
-    $ go mod tidy
-    ```
-    
-- 依存関係の追加
-    
-    ```bash
-    $ go get golang.org/x/example
-    go: downloading golang.org/x/example v0.0.0-20230515183114-5bec75697667
-    go: added golang.org/x/example v0.0.0-20230515183114-5bec75697667
-    ```
-    - `golang.org/x/example` モジュールに依存関係を追加
 - ワークスペースの初期化
     
     ```bash
@@ -136,6 +113,8 @@ title: "メモ"
         - オペランドの間には常にスペースが追加され、改行が追加される
         - 書き込まれたバイト数と、発生した書き込みエラーを返す
     - `Sprintf` 関数：　フォーマット指定子に従ってフォーマットし、結果を返す
+    - `Errorf` 関数：　フォーマット指定子に従ってフォーマットを設定し、文字列を error を満たす値として返す
+    - `Printf` 関数：　フォーマット指定子に従ってフォーマットし、標準出力に書き込む
     - `%v`：　構造体を出力するときのデフォルトフォーマットの値
     - `%q` (文字列とバイトのスライス)：　Go 構文で安全にエスケープされた二重引用符で囲まれた文字列
     - `%#q`：　バッククォートされた文字列
@@ -171,14 +150,64 @@ title: "メモ"
 - `unicode` パッケージ
     - https://pkg.go.dev/unicode
     - `ToUpper` 関数：　rune を大文字にマップする
-
+- `database/sql` パッケージ
+    - https://pkg.go.dev/database/sql
+    - データベースへの接続、トランザクションの実行、進行中の操作のキャンセルなどのための型と関数が含まれる
+    - `ErrNoRows` 変数：　QueryROw が行を返さない場合に Scan によって返される
+    - `DB` 型：　0 個以上の基礎となる接続のプールを表すデータベースハンドル
+        - `Open` 関数：　データベースドライバ名とドライバー固有のデータソース名で指定されたデータベースを開く
+        - `Ping` 関数：　データベースへの接続がまだ有効であることを確認し、必要に応じて接続を確立する
+        - `Query` 関数：　行を返すクエリ（通常は　SELECT）を実行する
+            - 引数は、クエリ内のプレースホルダーパラメータ用
+        - `QueryRow` 関数：　最大 1 行を返すことが期待されるクエリを実行する
+            - 常に非 nil 値を返す
+            - エラーは、 Row の Scan メソッドが呼び出されるまで延期される
+            - クエリで行が選択されていない場合、 *Row のスキャンは ErrNoRows を返す
+        - `Exec` 関数：　行を返さずにクエリを実行する
+            - 引数は、クエリ内のプレースホルダーパラメータ用
+    - `Rows` 型：　クエリの結果
+        - そのカーソルは、結果セットの最初の行の前から始まる
+        - Next 関数を使用して行から行に進む
+        - `Close` 関数：　Rows を閉じ、それ以上の列挙を防ぐ
+        - `Next` 関数：　Scan 関数で読み取るために次の結果行を準備する
+        - `Scan` 関数：　現在の行の列を dest が指す位置にコピーする
+        - `Err` 関数：　反復中に発生したエラーがあれば返す
+    - `Row` 型：　QueryRow を呼び出して単一の行を選択した結果
+        - `Scan` 関数：　一致した行の列を dest が指す値にコピーする
+            - 複数の行が一致する場合、 Scan は最初の行を使用し、残りの行を破棄する
+            - クエリに一致する行がない場合、 Scan は ErrNoRows を返す
+    - `Result` 型：　実行された SQL コマンドが要約される
+        - `LastInsertId` 関数：　コマンドに応答してデータベースが生成された整数
+- `mysql` パッケージ
+    - https://pkg.go.dev/github.com/go-sql-driver/mysql
+    - `Config` 型：　DSN 文字列から解析された構成
+        - DSN 文字列から解析するのではなく、新しい `Config` を作成する場合は、デフォルト値を設定する `NewConfig` 関数を使用する必要がある
+        - `FormatDSN` 関数：　指定された `Config` をドライバに渡すことができる DSN 文字列にフォーマットする
+- `builtin` パッケージ
+    - https://pkg.go.dev/builtin
+    - `append` 関数： 要素をスライスの末尾に追加する
 
 # モジュール系
 
+- `go mod init` で依存性追跡を有効にする
+    
+    ```bash
+    $ go mod init <prefix>/<descriptive-text>
+    ```
+    
+    - prefix: モジュールを部分的に説明する文字列
+    - descriptive-text: プロジェクト名
+        - https://go.dev/doc/modules/managing-dependencies#naming_module
+- `go mod tidy` で新規モジュールの要件・サムを追加する
+    
+    ```bash
+    $ go mod tidy
+    ```
+    
 - ローカルのモジュールを適用する
     - `go mod edit -replace` を使う
         
-        ```go
+        ```bash
         $ go mod edit -replace example.com/greetings=../greetings
         ```
         
@@ -205,6 +234,14 @@ title: "メモ"
 - `go build`：　パッケージとその依存関係をコンパイルする
 - `go install`：　パッケージをコンパイルしてsインストールする
 - `go list -f '{{.Target}}'`：　ビルドされたパッケージの場所を表示する
+- `go get` で依存関係を追加する
+    
+    ```bash
+    $ go get golang.org/x/example
+    go: downloading golang.org/x/example v0.0.0-20230515183114-5bec75697667
+    go: added golang.org/x/example v0.0.0-20230515183114-5bec75697667
+    ```
+    - `golang.org/x/example` モジュールに依存関係を追加
 
 # 型
 
@@ -223,6 +260,15 @@ title: "メモ"
     - `type rune = int32`
     - rune は int32 のエイリアスであり、あらゆる点で int32 と同等
     - 慣例により、文字値と整数値を区別するために使用される
+
+# 構文系
+- `defer`
+    - 関数が return するまで、関数の実行を延期する
+        
+        ```go
+        defer rows.Close()
+        ```
+        
 
 # テスト系
 
