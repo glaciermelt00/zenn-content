@@ -7,8 +7,8 @@ jobs:
     name: Assign author to PR
     runs-on: ubuntu-latest
     permissions:
-      pull-requests: write
       issues: write
+      pull-requests: write
     steps:
       - name: Assign author to PR
         uses: technote-space/assign-author@v1
