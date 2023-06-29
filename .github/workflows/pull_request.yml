@@ -1,6 +1,8 @@
 on:
   pull_request:
     types: [opened]
+permissions:
+  pull-requests: write
 name: Pull Request
 jobs:
   assignAuthor:
