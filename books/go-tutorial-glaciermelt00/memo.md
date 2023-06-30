@@ -186,6 +186,39 @@ title: "メモ"
 - `builtin` パッケージ
     - https://pkg.go.dev/builtin
     - `append` 関数： 要素をスライスの末尾に追加する
+- `gin-gonic/gin` パッケージ
+    - https://pkg.go.dev/github.com/gin-gonic/gin
+    - `Context` 型：　Gin の最も重要な部分
+        - これにより、ミドルウェア間で変数を渡したり、フローを管理したり、リクエストの JSON を検証したり、 JSON レスポンスをレンダリングしたりできる
+        - `IndentedJSON` 関数：　指定された構造体を適切な JSON (インデント + エンドライン) としてレスポンスボディにシリアル化する
+        - `JSON` 関数：　指定された構造体を JSON としてレスポンスボディにシリアル化する
+            - Content-Type を `application-json` に設定する
+        - `BindJSON` 関数：　c.MustBindWith(obj, binding.JSON) のショートカット
+        - `MustBindWith` 関数：　指定されたビンディングエンジンを使用して、渡された構造体ポインターをバインドする
+        - `Param` 関数：　URL パラメータの値を返す
+            - c.Params.ByName(key) のショートカット
+    - `Params` 型：　キーと値で構成される単一の URL パラメータ
+        - `ByName` 関数：　キーが指定された名前に一致する最初の Param の値を返す
+            - 一致する Param が見つからない場合は、空の文字列が返される
+    - `Engine` 型：　フレームワークのインスタンスであり、マルチプレクサー、ミドルウェア、構成設定が含まれる
+        - `Default` 関数：　Logger および Recovery ミドルウェアが既にアタッチされている Engine インスタンスが返される
+        - `Run` 関数：　ルーターを http.Server に接続し、 HTTP リクエストのリッスンと処理を開始する
+            - http.ListenAndServe 関数のショートカット
+    - `RouterGroup` 型：　ルーターを構成するために内部的に使用され、プレフィックスとハンドラー（ミドルウェア）の配列に関連づけられる
+        - `GET` 関数：　router.Handle("GET", path, handlers) のショートカット
+        - `Handle` 関数：　指定されたパスとメソッドを使用して、新しいリクエストハンドルとミドルウェアを登録する
+        - `POST` 関数：　router.Handle("POST", path, handlers) のショートカット
+- `http` パッケージ
+    - https://pkg.go.dev/net/http
+    - `StatusOK` 定数：　HTTP ステータスコード 200
+    - `StatusCreated` 定数：　HTTP ステータスコード 201
+    - `StatusNotFound` 定数：　HTTP ステータスコード 404
+- `binding` パッケージ
+    - https://pkg.go.dev/github.com/gin-gonic/gin/binding
+    - `JSON` 定数：　jsonBinding{}
+        - Binding インターフェイスを実装しており、リクエストに含まれるデータを構造体インスタンスにバインドするために使用できる
+    - `Binding` 型：　JSON リクエスト本文、クエリパラメータ、フォーム POST などのリクエスト内に存在するデータをバインドするために実装する必要があるインターフェイスを記述する
+        - 
 
 # モジュール系
 
@@ -300,3 +333,17 @@ title: "メモ"
         ```
         
 
+# JSON 系
+
+- struct の定義
+    - `json:"..."` のように、フィールドタグを付ける
+    
+    ```go
+    type album struct {
+        ID     string  `json:"id"`
+        Title  string  `json:"title"`
+        Artist string  `json:"artist"`
+        Price  float64 `json:"price"`
+    }
+    ```
+    
