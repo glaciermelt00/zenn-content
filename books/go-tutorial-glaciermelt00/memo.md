@@ -195,7 +195,11 @@ title: "メモ"
             - Content-Type を `application-json` に設定する
         - `BindJSON` 関数：　c.MustBindWith(obj, binding.JSON) のショートカット
         - `MustBindWith` 関数：　指定されたビンディングエンジンを使用して、渡された構造体ポインターをバインドする
-        - d
+        - `Param` 関数：　URL パラメータの値を返す
+            - c.Params.ByName(key) のショートカット
+    - `Params` 型：　キーと値で構成される単一の URL パラメータ
+        - `ByName` 関数：　キーが指定された名前に一致する最初の Param の値を返す
+            - 一致する Param が見つからない場合は、空の文字列が返される
     - `Engine` 型：　フレームワークのインスタンスであり、マルチプレクサー、ミドルウェア、構成設定が含まれる
         - `Default` 関数：　Logger および Recovery ミドルウェアが既にアタッチされている Engine インスタンスが返される
         - `Run` 関数：　ルーターを http.Server に接続し、 HTTP リクエストのリッスンと処理を開始する
@@ -208,6 +212,7 @@ title: "メモ"
     - https://pkg.go.dev/net/http
     - `StatusOK` 定数：　HTTP ステータスコード 200
     - `StatusCreated` 定数：　HTTP ステータスコード 201
+    - `StatusNotFound` 定数：　HTTP ステータスコード 404
 - `binding` パッケージ
     - https://pkg.go.dev/github.com/gin-gonic/gin/binding
     - `JSON` 定数：　jsonBinding{}
