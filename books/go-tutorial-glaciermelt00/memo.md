@@ -193,6 +193,9 @@ title: "メモ"
         - `IndentedJSON` 関数：　指定された構造体を適切な JSON (インデント + エンドライン) としてレスポンスボディにシリアル化する
         - `JSON` 関数：　指定された構造体を JSON としてレスポンスボディにシリアル化する
             - Content-Type を `application-json` に設定する
+        - `BindJSON` 関数：　c.MustBindWith(obj, binding.JSON) のショートカット
+        - `MustBindWith` 関数：　指定されたビンディングエンジンを使用して、渡された構造体ポインターをバインドする
+        - d
     - `Engine` 型：　フレームワークのインスタンスであり、マルチプレクサー、ミドルウェア、構成設定が含まれる
         - `Default` 関数：　Logger および Recovery ミドルウェアが既にアタッチされている Engine インスタンスが返される
         - `Run` 関数：　ルーターを http.Server に接続し、 HTTP リクエストのリッスンと処理を開始する
@@ -200,9 +203,17 @@ title: "メモ"
     - `RouterGroup` 型：　ルーターを構成するために内部的に使用され、プレフィックスとハンドラー（ミドルウェア）の配列に関連づけられる
         - `GET` 関数：　router.Handle("GET", path, handlers) のショートカット
         - `Handle` 関数：　指定されたパスとメソッドを使用して、新しいリクエストハンドルとミドルウェアを登録する
+        - `POST` 関数：　router.Handle("POST", path, handlers) のショートカット
 - `http` パッケージ
     - https://pkg.go.dev/net/http
     - `StatusOK` 定数：　HTTP ステータスコード 200
+    - `StatusCreated` 定数：　HTTP ステータスコード 201
+- `binding` パッケージ
+    - https://pkg.go.dev/github.com/gin-gonic/gin/binding
+    - `JSON` 定数：　jsonBinding{}
+        - Binding インターフェイスを実装しており、リクエストに含まれるデータを構造体インスタンスにバインドするために使用できる
+    - `Binding` 型：　JSON リクエスト本文、クエリパラメータ、フォーム POST などのリクエスト内に存在するデータをバインドするために実装する必要があるインターフェイスを記述する
+        - 
 
 # モジュール系
 
