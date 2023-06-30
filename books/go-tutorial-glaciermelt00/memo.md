@@ -208,6 +208,7 @@ title: "メモ"
         - `GET` 関数：　router.Handle("GET", path, handlers) のショートカット
         - `Handle` 関数：　指定されたパスとメソッドを使用して、新しいリクエストハンドルとミドルウェアを登録する
         - `POST` 関数：　router.Handle("POST", path, handlers) のショートカット
+    - `H` 型：　map[string]any のショートカット
 - `http` パッケージ
     - https://pkg.go.dev/net/http
     - `StatusOK` 定数：　HTTP ステータスコード 200
@@ -347,3 +348,8 @@ title: "メモ"
     }
     ```
     
+
+# ジェネリクス
+- `comparable` 型
+    - https://go.dev/blog/comparable#comparable-types
+    - `==` と `!=` で比較できる型
