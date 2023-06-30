@@ -143,6 +143,10 @@ title: "メモ"
 - `testing` パッケージ
     - `T` 型：　テスト状態を管理し、フォーマットされたテストログをサポートするために、テスト関数に渡される型
         - `Fatalf` 関数：　`Logf` の後に `FailNow` が続くものと同等
+    - `F` 型：　fuzz テストに渡される型
+        - `Add` 関数：　fuzz テストのシードコーパスに引数を追加する
+        - `Fuzz` 関数：　fuzz テストのために fuzz 関数 ff を実行する
+            - 一覧の引数に対して ff が失敗した場合、それらの引数はシードコーパスに追加される。
 - `regexp` パッケージ
     - `MustCompile(str string) *Regexp` 関数：　Compile に似ているが、式を解析できない場合にパニックを起こす
         - これにより、コンパイルされた正規表現を保持するグローバル変数の安全な初期化が簡素化される
@@ -208,6 +212,7 @@ title: "メモ"
         - `GET` 関数：　router.Handle("GET", path, handlers) のショートカット
         - `Handle` 関数：　指定されたパスとメソッドを使用して、新しいリクエストハンドルとミドルウェアを登録する
         - `POST` 関数：　router.Handle("POST", path, handlers) のショートカット
+    - `H` 型：　map[string]any のショートカット
 - `http` パッケージ
     - https://pkg.go.dev/net/http
     - `StatusOK` 定数：　HTTP ステータスコード 200
@@ -218,7 +223,10 @@ title: "メモ"
     - `JSON` 定数：　jsonBinding{}
         - Binding インターフェイスを実装しており、リクエストに含まれるデータを構造体インスタンスにバインドするために使用できる
     - `Binding` 型：　JSON リクエスト本文、クエリパラメータ、フォーム POST などのリクエスト内に存在するデータをバインドするために実装する必要があるインターフェイスを記述する
-        - 
+- `unicode/utf8` パッケージ
+    - https://pkg.go.dev/unicode/utf8
+    - `ValidString` 関数：　完全に有効な UTF-8 でエンコードされたルーンで構成されているかどうかを報告する
+    - `RuneCountInString` 関数：　RuenCount に似ているが、その入力は文字列
 
 # モジュール系
 
@@ -332,6 +340,12 @@ title: "メモ"
         ok      example.com/greetings   0.125s
         ```
         
+- `go test -fuzz=Fuzz`
+    - fuzz テストを実行する
+- `go test -run=FuzzReverse/82c78cde10256ca2`
+    - 特定のコーパスエントリを実行する
+- `go test -fuzz=Fuzz -fuzztime 30s`
+    - 30 秒間 fuzz テストを実行し、障害が見つからなかった場合に終了する
 
 # JSON 系
 
@@ -347,3 +361,9 @@ title: "メモ"
     }
     ```
     
+
+# ジェネリクス
+
+- `comparable` 型
+    - https://go.dev/blog/comparable#comparable-types
+    - `==` と `!=` で比較できる型
