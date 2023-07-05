@@ -281,6 +281,10 @@ title: "メモ"
         - `MustBindWith` 関数：　指定されたビンディングエンジンを使用して、渡された構造体ポインターをバインドする
         - `Param` 関数：　URL パラメータの値を返す
             - c.Params.ByName(key) のショートカット
+        - `Bind` 関数：　Method と Content-Type をチェックしてバインディングエンジンを自動的に選択する
+            - Content-TYpe == "application/json" の場合、 JSON または XML を JSON 入力として使用して、リクエストの本文を JSON として解析する
+        - `ShouldBind` 関数：　Method と Content-Type をチェックしてバインディングエンジンを自動的に選択する
+            - c.Bind() と似ているが、このメソッドは応答ステータスコードを 400 に設定したり、入力が有効でない場合に中止したりしない
     - `Params` 型：　キーと値で構成される単一の URL パラメータ
         - `ByName` 関数：　キーが指定された名前に一致する最初の Param の値を返す
             - 一致する Param が見つからない場合は、空の文字列が返される
