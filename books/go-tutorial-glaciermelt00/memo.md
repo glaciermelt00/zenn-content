@@ -104,6 +104,86 @@ title: "メモ"
 - `want := regexp.MustCompile(`\b`+name+`\b`)`
     - 正規表現をコンパイルする
     - name というパターンのみマッチさせる
+- 変数宣言
+    - `var i int`
+        - `int` 型の変数 `i` を宣言
+    - `var i, j int = 1, 2`
+        - `int` 型の変数 `i` と `j` を宣言し、初期化
+    - `k := 3`
+        - `int` 型の変数 `k` を宣言し、初期化
+        - `:=` は、変数の宣言と初期化を同時に行う
+        - 関数の中でのみ使用できる
+    - `var i int`
+        - 変数に初期値を与えずに宣言すると、ゼロ値が与えられる
+        - 数値型: 0
+        - bool 型: false
+        - string 型: ""
+    - `var f float64 = float64(i)`
+        - 型変換: 変数 v, 型 T がある場合、T(v) は変数 v をT 型へ変換する
+        - シンプルに書ける
+            - `f := float64(i)`
+    - `i := 42 // int`
+        - 型推論: 明示的な値を指定せずに変数を宣言する場合、変数の型は右側の変数か、型推論される
+    - `const World = "世界"`
+        - 定数: const キーワードを使って、変数と同じように宣言できる
+        - 変数は、文字、文字列、boolean、数値のみで使える
+        - 数値の定数: 高精度な値
+            - 型のない定数は、その状況によって必要な型をとる
+- `for`
+    ```go
+    for i := 0; i < 10; i++ {
+        sum += i
+    }
+    ```
+        - 初期ステートメント、条件式、後処理ステートメントで構成される
+        - 中括弧は常に必要
+
+    ```go
+    sum := 1
+    for ; sum < 1000; {
+        sum += sum
+    }
+    ```
+        - 初期化と後処理ステートメントの技術は任意
+
+    ```go
+    sum := 1
+    for sum < 1000 {
+        sum += sum
+    }
+    ```
+        - セミコロンを省略できる
+        - 他言語での while のような使い方
+
+    ```go
+    for {
+    }
+    ```
+        - ループ条件式を省略すれば、無限ループになる
+- `if`
+    ```go
+    if x < 0 {
+        return sqrt(-x) + "i"
+    }
+    ```
+        - 括弧は不要で、中括弧は必要
+
+    ```go
+    if v := math.Pow(x, n); v < lim {
+        return v
+    }
+    ```
+        - 条件の前に、評価す？ための簡単なステートメントを書ける
+        - ここで宣言された変数は、 if のスコープ内だけで有効
+
+    ```go
+    if v := math.Pow(x, n); v < lim {
+        return v
+    } else {
+        fmt.Printf("%g >= %g\n", v, lim)
+    }
+    ```
+        - if ステートメントで宣言された変数は、 else ブロック内でも使える
 
 # パッケージ系
 
@@ -201,6 +281,10 @@ title: "メモ"
         - `MustBindWith` 関数：　指定されたビンディングエンジンを使用して、渡された構造体ポインターをバインドする
         - `Param` 関数：　URL パラメータの値を返す
             - c.Params.ByName(key) のショートカット
+        - `Bind` 関数：　Method と Content-Type をチェックしてバインディングエンジンを自動的に選択する
+            - Content-TYpe == "application/json" の場合、 JSON または XML を JSON 入力として使用して、リクエストの本文を JSON として解析する
+        - `ShouldBind` 関数：　Method と Content-Type をチェックしてバインディングエンジンを自動的に選択する
+            - c.Bind() と似ているが、このメソッドは応答ステータスコードを 400 に設定したり、入力が有効でない場合に中止したりしない
     - `Params` 型：　キーと値で構成される単一の URL パラメータ
         - `ByName` 関数：　キーが指定された名前に一致する最初の Param の値を返す
             - 一致する Param が見つからない場合は、空の文字列が返される
@@ -286,6 +370,15 @@ title: "メモ"
 
 # 型
 
+- 組み込み型
+    - bool
+    - string
+    - 整数: int, int8, int16, int64, uint, uint8, uint16, uint32, uint64, uintptr
+    - byte: utint8 の別名
+    - rune: int32 の別名: Unicode のコードポイントを表す
+    - 浮動小数点数: float32, float64
+    - 複素数: complex64, complex128
+        - factored に宣言できる
 - スライス
     - `[]string`
     - 配列に似ている
