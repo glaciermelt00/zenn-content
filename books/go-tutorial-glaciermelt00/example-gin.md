@@ -377,3 +377,105 @@ Please check https://pkg.go.dev/github.com/gin-gonic/gin#readme-don-t-trust-all-
         ```bash
         {"color":["red","green","blue"]}
         ```
+- クエリ文字列 / ポストデータをバインドする
+    - バインドする
+        ```go
+        package main
+
+        import (
+            "log"
+            "time"
+
+            "github.com/gin-gonic/gin"
+        )
+
+        type Person struct {
+            Name     string    `form:"name"`
+            Address  string    `form:"address"`
+            Birthday time.Time `form:"birthday" time_format:"2006-01-02" time_utc:"1"`
+        }
+
+        func main() {
+            route := gin.Default()
+            route.GET("/testing", startPage)
+            route.Run(":8085")
+        }
+
+        func startPage(c *gin.Context) {
+            var person Person
+            // If `GET`, only `Form` binding engine (`query`) used.
+            // If `POST`, first checks the `content-type` for `JSON` or `XML`, then uses `Form` (`form-data`).
+            // See more at https://github.com/gin-gonic/gin/blob/master/binding/binding.go#L48
+            if c.ShouldBind(&person) == nil {
+                log.Println(person.Name)
+                log.Println(person.Address)
+                log.Println(person.Birthday)
+            }
+
+            c.String(200, "Success")
+        }
+        ```
+- URI をバインドする
+    - URI をバインドする
+        ```go
+        package main
+
+        import "github.com/gin-gonic/gin"
+
+        type Person struct {
+            ID   string `uri:"id" binding:"required,uuid"`
+            Name string `uri:"name" binding:"required"`
+        }
+
+        func main() {
+            route := gin.Default()
+            route.GET("/:name/:id", func(c *gin.Context) {
+                var person Person
+                if err := c.ShouldBindUri(&person); err != nil {
+                    c.JSON(400, gin.H{"msg": err})
+                    return
+                }
+                c.JSON(200, gin.H{"name": person.Name, "uuid": person.ID})
+            })
+            route.Run(":8088")
+        }
+        ```
+- テンプレートを使用して、単一のバイナリをビルドする
+    - go-assets を使用すると、サードパーティのパッケージを使用して、テンプレートを含む単一のバイナリにサーバーを構築できる
+        ```go
+        func main() {
+            r := gin.New()
+
+            t, err := loadTemplate()
+            if err != nil {
+                panic(err)
+            }
+            r.SetHTMLTemplate(t)
+
+            r.GET("/", func(c *gin.Context) {
+                c.HTML(http.StatusOK, "/html/index.tmpl", nil)
+            })
+            r.Run(":8080")
+        }
+
+        // loadTemplate loads templates embedded by go-assets-builder
+        func loadTemplate() (*template.Template, error) {
+            t := template.New("")
+            for name, file := range Assets.Files {
+                if file.IsDir() || !strings.HasSuffix(name, ".tmpl") {
+                    continue
+                }
+                h, err := ioutil.ReadAll(file)
+                if err != nil {
+                    return nil, err
+                }
+                t, err = t.New(name).Parse(string(h))
+                if err != nil {
+                    return nil, err
+                }
+            }
+            return t, nil
+        }
+        ```
+- ログ出力の色分けの制御
+    - デフォルトでは、コンソールに出力されるログは、検出された TTY に応じて色分けされる
