@@ -337,3 +337,153 @@ group :production do
   gem 'pg', '1.1.4'
 end
 ```
+
+## bundle 設定
+
+```bash
+// bundle config
+$ bundle _2.2.17_ config set --local without 'production'
+$ bundle _2.2.17_ config
+Settings are listed in order of priority. The top value will be used.
+build.puma
+Set for your local app (/Volumes/dev/git-dev/rails/hello_app/.bundle/config): "--with-opt-dir=/usr/local/Cellar/openssl@3/3.1.1_1"
+Set for the current user (/Users/glaciermelt/.bundle/config): "--with-cflags=-Wno-error=implicit-function-declaration"
+
+without
+Set for your local app (/Volumes/dev/git-dev/rails/hello_app/.bundle/config): [:production]
+
+// bundle install
+$ bundle _2.2.17_ install
+Fetching gem metadata from https://rubygems.org/...........
+Resolving dependencies...
+Using rake 12.3.3
+Using concurrent-ruby 1.2.2
+Using minitest 5.18.1
+Using thread_safe 0.3.6
+Using erubi 1.12.0
+Using nio4r 2.5.9
+Using timeout 0.4.0
+Using crass 1.0.6
+Using bindex 0.8.1
+Using zeitwerk 2.6.8
+Using msgpack 1.7.1
+Using byebug 11.0.1
+Using regexp_parser 1.8.2
+Using childprocess 2.0.0
+Using ffi 1.15.5
+Using rb-fsevent 0.11.2
+Using public_suffix 5.0.3
+Using ruby_dep 1.5.0
+Using thor 1.2.2
+Using websocket-extensions 0.1.5
+Using tilt 2.2.0
+Using mini_mime 1.1.2
+Using sqlite3 1.4.2
+Using builder 3.2.4
+Using i18n 1.14.1
+Using tzinfo 1.2.11
+Using puma 4.3.6
+Using bundler 2.2.17
+Using net-protocol 0.2.1
+Using bootsnap 1.10.3
+Using rb-inotify 0.10.1
+Using websocket-driver 0.7.5
+Using activesupport 6.0.4
+Using net-pop 0.1.2
+Using net-smtp 0.3.3
+Using listen 3.1.5
+Using sass-listen 4.0.0
+Using globalid 1.1.0
+Using rubyzip 1.3.0
+Using jbuilder 2.9.1
+Using marcel 1.0.2
+Using activejob 6.0.4
+Using sass 3.7.4
+Using selenium-webdriver 3.142.4
+Using activemodel 6.0.4
+Using spring 2.1.0
+Using turbolinks-source 5.2.0
+Using racc 1.7.1
+Using activerecord 6.0.4
+Using spring-watcher-listen 2.0.1
+Using turbolinks 5.2.0
+Using method_source 1.0.0
+Using rack 2.2.7
+Using nokogiri 1.15.3 (x86_64-darwin)
+Using addressable 2.8.4
+Using rack-test 2.1.0
+Using sprockets 3.7.2
+Using date 3.3.3
+Using rails-dom-testing 2.1.1
+Using rack-proxy 0.7.6
+Using net-imap 0.3.6
+Using xpath 3.2.0
+Using webdrivers 4.1.2
+Using loofah 2.21.3
+Using mail 2.8.1
+Using capybara 3.28.0
+Using rails-html-sanitizer 1.6.0
+Using actionview 6.0.4
+Using actionpack 6.0.4
+Using actioncable 6.0.4
+Using activestorage 6.0.4
+Using actionmailer 6.0.4
+Using railties 6.0.4
+Using sprockets-rails 3.4.2
+Using actionmailbox 6.0.4
+Using actiontext 6.0.4
+Using sass-rails 5.1.0
+Using web-console 4.0.1
+Using webpacker 4.0.7
+Using rails 6.0.4
+Bundle complete! 18 Gemfile dependencies, 80 gems now installed.
+Gems in the group 'production' were not installed.
+Use `bundle info [gemname]` to see where a bundled gem is installed.
+```
+
+## Heroku がインストールされているか確認
+
+```bash
+$ heroku --version
+/usr/local/Cellar/heroku/8.1.9/libexec/bin/node: --openssl-legacy-provider is not allowed in NODE_OPTIONS
+
+// NODE_OPTIONS を削除する
+$ export NODE_OPTIONS=""
+
+$ echo $NODE_OPTIONS
+
+
+$ heroku --version
+heroku --version
+ ›   Warning: Our terms of service have changed: https://dashboard.heroku.com/terms-of-service
+heroku/8.1.9 darwin-x64 node-v16.19.0
+```
+
+## Heroku へログイン
+
+```bash
+$ heroku login --interactive
+heroku: Enter your login credentials
+Email [glacier-melt@hotmail.co.jp]:
+Password: ******************
+ ›   Error: Invalid credentials provided.
+ ›
+ ›   Error ID: unauthorized
+
+// パスワードを調整して再度ログインする
+$ heroku login --interactive
+heroku: Enter your login credentials
+Email [glacier-melt@hotmail.co.jp]:
+Password: ********************
+ ›   Error: Your account has MFA enabled; API requests using basic authentication with email and password are not supported. Please generate an authorization token for API access.
+ ›
+ ›   Error ID: vaas_enrolled
+
+// パスワードに API Key を入力
+$ heroku login -i
+
+heroku: Enter your login credentials
+Email [glacier-melt@hotmail.co.jp]:
+Password: ************************************
+Logged in as glacier-melt@hotmail.co.jp
+```
