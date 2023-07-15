@@ -216,6 +216,7 @@ title: "メモ"
     - `SetFlags` 関数：　ロガーの出力フラグを設定する
         - フラグビットは Ldate, Ltime など
     - `Fatal` 関数：　`Print()` の後に `os.Exit(1)` を呼び出すのと同等
+    - `Println` 関数：　Output を呼び出して、標準ロガーに出力する
 - `math/rand` パッケージ
     - https://pkg.go.dev/math/rand
     - `Intn` 関数：　`int` として、非負の擬似ランダムな数を返す：　デフォルトの Source から半開区間 `[0, n)` で
@@ -285,6 +286,7 @@ title: "メモ"
             - Content-TYpe == "application/json" の場合、 JSON または XML を JSON 入力として使用して、リクエストの本文を JSON として解析する
         - `ShouldBind` 関数：　Method と Content-Type をチェックしてバインディングエンジンを自動的に選択する
             - c.Bind() と似ているが、このメソッドは応答ステータスコードを 400 に設定したり、入力が有効でない場合に中止したりしない
+        - `ShouldBindUri` 関数：　指定されたバインディングエンジンを使用して、渡された構造体ポインターをバインドする
     - `Params` 型：　キーと値で構成される単一の URL パラメータ
         - `ByName` 関数：　キーが指定された名前に一致する最初の Param の値を返す
             - 一致する Param が見つからない場合は、空の文字列が返される
@@ -297,6 +299,8 @@ title: "メモ"
         - `Handle` 関数：　指定されたパスとメソッドを使用して、新しいリクエストハンドルとミドルウェアを登録する
         - `POST` 関数：　router.Handle("POST", path, handlers) のショートカット
     - `H` 型：　map[string]any のショートカット
+    - `DisableConsoleColor` 関数：　コンソールでのカラー出力を無効にする
+    - `ForceConsoleColor` 関数：　コンソールでのカラー出力を強制する
 - `http` パッケージ
     - https://pkg.go.dev/net/http
     - `StatusOK` 定数：　HTTP ステータスコード 200
@@ -304,13 +308,17 @@ title: "メモ"
     - `StatusNotFound` 定数：　HTTP ステータスコード 404
 - `binding` パッケージ
     - https://pkg.go.dev/github.com/gin-gonic/gin/binding
-    - `JSON` 定数：　jsonBinding{}
+    - `JSON` 変数：　jsonBinding{}
         - Binding インターフェイスを実装しており、リクエストに含まれるデータを構造体インスタンスにバインドするために使用できる
+    - `Uri` 変数：　uriBinding{}
     - `Binding` 型：　JSON リクエスト本文、クエリパラメータ、フォーム POST などのリクエスト内に存在するデータをバインドするために実装する必要があるインターフェイスを記述する
 - `unicode/utf8` パッケージ
     - https://pkg.go.dev/unicode/utf8
     - `ValidString` 関数：　完全に有効な UTF-8 でエンコードされたルーンで構成されているかどうかを報告する
     - `RuneCountInString` 関数：　RuenCount に似ているが、その入力は文字列
+- `time` パッケージ
+    - https://pkg.go.dev/time
+    - `Time` 型：　ナノ秒の精度で瞬間を表す
 
 # モジュール系
 
