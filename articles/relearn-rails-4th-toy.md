@@ -1764,3 +1764,147 @@ remote: Verifying deploy... done.
 To https://git.heroku.com/tranquil-tor-32730.git
  * [new branch]      main -> main
 ```
+
+## ログを調べる
+
+```bash
+$ heroku logs --tail --app tranquil-tor-32730
+2023-07-16T00:58:57.733680+00:00 app[web.1]: => Run `rails server --help` for more startup options
+2023-07-16T00:58:58.551631+00:00 app[web.1]: Puma starting in single mode...
+2023-07-16T00:58:58.551649+00:00 app[web.1]: * Version 4.3.6 (ruby 2.7.6-p219), codename: Mysterious Traveller
+2023-07-16T00:58:58.551651+00:00 app[web.1]: * Min threads: 5, max threads: 5
+2023-07-16T00:58:58.551651+00:00 app[web.1]: * Environment: production
+2023-07-16T00:58:58.551927+00:00 app[web.1]: * Listening on tcp://0.0.0.0:16441
+2023-07-16T00:58:58.552095+00:00 app[web.1]: Use Ctrl-C to stop
+2023-07-16T00:58:59.033096+00:00 heroku[web.1]: State changed from starting to up
+2023-07-17T01:07:08.240966+00:00 heroku[web.1]: Cycling
+2023-07-17T01:07:08.243343+00:00 heroku[web.1]: State changed from up to starting
+2023-07-17T01:07:08.929743+00:00 heroku[web.1]: Stopping all processes with SIGTERM
+2023-07-17T01:07:08.965260+00:00 app[web.1]: - Gracefully stopping, waiting for requests to finish
+2023-07-17T01:07:08.974834+00:00 app[web.1]: === puma shutdown: 2023-07-17 01:07:08 +0000 ===
+2023-07-17T01:07:08.974836+00:00 app[web.1]: - Goodbye!
+2023-07-17T01:07:08.976243+00:00 app[web.1]: Exiting
+2023-07-17T01:07:09.195056+00:00 heroku[web.1]: Process exited with status 143
+2023-07-17T01:07:13.396989+00:00 heroku[web.1]: Starting process with command `bin/rails server -p ${PORT:-5000} -e production`
+2023-07-17T01:07:15.812548+00:00 app[web.1]: /app/vendor/ruby-2.7.6/lib/ruby/2.7.0/net/protocol.rb:66: warning: already initialized constant Net::ProtocRetryError
+2023-07-17T01:07:15.812579+00:00 app[web.1]: /app/vendor/bundle/ruby/2.7.0/gems/net-protocol-0.2.1/lib/net/protocol.rb:68: warning: previous definition of ProtocRetryError was here
+2023-07-17T01:07:15.812579+00:00 app[web.1]: /app/vendor/ruby-2.7.6/lib/ruby/2.7.0/net/protocol.rb:206: warning: already initialized constant Net::BufferedIO::BUFSIZE
+2023-07-17T01:07:15.812579+00:00 app[web.1]: /app/vendor/bundle/ruby/2.7.0/gems/net-protocol-0.2.1/lib/net/protocol.rb:214: warning: previous definition of BUFSIZE was here
+2023-07-17T01:07:15.812579+00:00 app[web.1]: /app/vendor/ruby-2.7.6/lib/ruby/2.7.0/net/protocol.rb:503: warning: already initialized constant Net::NetPrivate::Socket
+2023-07-17T01:07:15.812580+00:00 app[web.1]: /app/vendor/bundle/ruby/2.7.0/gems/net-protocol-0.2.1/lib/net/protocol.rb:541: warning: previous definition of Socket was here
+2023-07-17T01:07:15.861768+00:00 app[web.1]: => Booting Puma
+2023-07-17T01:07:15.861770+00:00 app[web.1]: => Rails 6.0.4 application starting in production
+2023-07-17T01:07:15.861770+00:00 app[web.1]: => Run `rails server --help` for more startup options
+2023-07-17T01:07:16.612937+00:00 app[web.1]: Puma starting in single mode...
+2023-07-17T01:07:16.612958+00:00 app[web.1]: * Version 4.3.6 (ruby 2.7.6-p219), codename: Mysterious Traveller
+2023-07-17T01:07:16.612959+00:00 app[web.1]: * Min threads: 5, max threads: 5
+2023-07-17T01:07:16.612959+00:00 app[web.1]: * Environment: production
+2023-07-17T01:07:16.613161+00:00 app[web.1]: * Listening on tcp://0.0.0.0:55746
+2023-07-17T01:07:16.613331+00:00 app[web.1]: Use Ctrl-C to stop
+2023-07-17T01:07:16.835141+00:00 heroku[web.1]: State changed from starting to up
+2023-07-17T04:19:08.000000+00:00 app[api]: Build started by user glacier-melt@hotmail.co.jp
+2023-07-17T04:19:49.534023+00:00 app[api]: Release v8 created by user glacier-melt@hotmail.co.jp
+2023-07-17T04:19:49.534023+00:00 app[api]: Deploy 2fe73a58 by user glacier-melt@hotmail.co.jp
+2023-07-17T04:19:49.738381+00:00 heroku[web.1]: Restarting
+2023-07-17T04:19:49.740561+00:00 heroku[web.1]: State changed from up to starting
+2023-07-17T04:19:50.364070+00:00 heroku[web.1]: Stopping all processes with SIGTERM
+2023-07-17T04:19:50.402041+00:00 app[web.1]: - Gracefully stopping, waiting for requests to finish
+2023-07-17T04:19:50.403479+00:00 app[web.1]: === puma shutdown: 2023-07-17 04:19:50 +0000 ===
+2023-07-17T04:19:50.403482+00:00 app[web.1]: - Goodbye!
+2023-07-17T04:19:50.404883+00:00 app[web.1]: Exiting
+2023-07-17T04:19:50.587132+00:00 heroku[web.1]: Process exited with status 143
+2023-07-17T04:19:52.000000+00:00 app[api]: Build succeeded
+2023-07-17T04:19:53.617622+00:00 heroku[web.1]: Starting process with command `bin/rails server -p ${PORT:-5000} -e production`
+2023-07-17T04:19:55.835394+00:00 app[web.1]: => Booting Puma
+2023-07-17T04:19:55.835406+00:00 app[web.1]: => Rails 6.0.4 application starting in production
+2023-07-17T04:19:55.835407+00:00 app[web.1]: => Run `rails server --help` for more startup options
+2023-07-17T04:19:56.517135+00:00 app[web.1]: Puma starting in single mode...
+2023-07-17T04:19:56.517161+00:00 app[web.1]: * Version 4.3.6 (ruby 2.7.6-p219), codename: Mysterious Traveller
+2023-07-17T04:19:56.517162+00:00 app[web.1]: * Min threads: 5, max threads: 5
+2023-07-17T04:19:56.517162+00:00 app[web.1]: * Environment: production
+2023-07-17T04:19:56.517316+00:00 app[web.1]: * Listening on tcp://0.0.0.0:54525
+2023-07-17T04:19:56.517477+00:00 app[web.1]: Use Ctrl-C to stop
+2023-07-17T04:19:56.883199+00:00 heroku[web.1]: State changed from starting to up
+2023-07-17T04:20:44.263577+00:00 app[web.1]: I, [2023-07-17T04:20:44.263473 #2]  INFO -- : [373a3e2b-9460-42d7-9f1d-f16660d010f4] Started GET "/" for 217.178.26.43 at 2023-07-17 04:20:44 +0000
+2023-07-17T04:20:44.265279+00:00 app[web.1]: I, [2023-07-17T04:20:44.265207 #2]  INFO -- : [373a3e2b-9460-42d7-9f1d-f16660d010f4] Processing by UsersController#index as HTML
+2023-07-17T04:20:44.271230+00:00 app[web.1]: I, [2023-07-17T04:20:44.271167 #2]  INFO -- : [373a3e2b-9460-42d7-9f1d-f16660d010f4]   Rendering users/index.html.erb within layouts/application
+2023-07-17T04:20:44.400492+00:00 app[web.1]: D, [2023-07-17T04:20:44.400412 #2] DEBUG -- : [373a3e2b-9460-42d7-9f1d-f16660d010f4]   User Load (1.3ms)  SELECT "users".* FROM "users"
+2023-07-17T04:20:44.400549+00:00 app[web.1]: I, [2023-07-17T04:20:44.400527 #2]  INFO -- : [373a3e2b-9460-42d7-9f1d-f16660d010f4]   Rendered users/index.html.erb within layouts/application (Duration: 129.3ms | Allocations: 4797)
+2023-07-17T04:20:44.400680+00:00 app[web.1]: I, [2023-07-17T04:20:44.400662 #2]  INFO -- : [373a3e2b-9460-42d7-9f1d-f16660d010f4] Completed 500 Internal Server Error in 135ms (ActiveRecord: 71.8ms | Allocations: 6254)
+2023-07-17T04:20:44.401472+00:00 app[web.1]: F, [2023-07-17T04:20:44.401443 #2] FATAL -- : [373a3e2b-9460-42d7-9f1d-f16660d010f4]
+2023-07-17T04:20:44.401473+00:00 app[web.1]: [373a3e2b-9460-42d7-9f1d-f16660d010f4] ActionView::Template::Error (PG::UndefinedTable: ERROR:  relation "users" does not exist
+2023-07-17T04:20:44.401473+00:00 app[web.1]: LINE 1: SELECT "users".* FROM "users"
+2023-07-17T04:20:44.401474+00:00 app[web.1]: ^
+2023-07-17T04:20:44.401474+00:00 app[web.1]: ):
+2023-07-17T04:20:44.401475+00:00 app[web.1]: [373a3e2b-9460-42d7-9f1d-f16660d010f4]     12:   </thead>
+2023-07-17T04:20:44.401476+00:00 app[web.1]: [373a3e2b-9460-42d7-9f1d-f16660d010f4]     13:
+2023-07-17T04:20:44.401476+00:00 app[web.1]: [373a3e2b-9460-42d7-9f1d-f16660d010f4]     14:   <tbody>
+2023-07-17T04:20:44.401477+00:00 app[web.1]: [373a3e2b-9460-42d7-9f1d-f16660d010f4]     15:     <% @users.each do |user| %>
+2023-07-17T04:20:44.401477+00:00 app[web.1]: [373a3e2b-9460-42d7-9f1d-f16660d010f4]     16:       <tr>
+2023-07-17T04:20:44.401478+00:00 app[web.1]: [373a3e2b-9460-42d7-9f1d-f16660d010f4]     17:         <td><%= user.name %></td>
+2023-07-17T04:20:44.401478+00:00 app[web.1]: [373a3e2b-9460-42d7-9f1d-f16660d010f4]     18:         <td><%= user.email %></td>
+2023-07-17T04:20:44.401478+00:00 app[web.1]: [373a3e2b-9460-42d7-9f1d-f16660d010f4]
+2023-07-17T04:20:44.401478+00:00 app[web.1]: [373a3e2b-9460-42d7-9f1d-f16660d010f4] app/views/users/index.html.erb:15
+2023-07-17T04:20:44.401601+00:00 heroku[router]: at=info method=GET path="/" host=tranquil-tor-32730-10dc03d8ffdc.herokuapp.com request_id=373a3e2b-9460-42d7-9f1d-f16660d010f4 fwd="217.178.26.43" dyno=web.1 connect=0ms service=142ms status=500 bytes=1827 protocol=https
+2023-07-17T04:20:44.681033+00:00 heroku[router]: at=info method=GET path="/favicon.ico" host=tranquil-tor-32730-10dc03d8ffdc.herokuapp.com request_id=ce75d54a-8bf1-47c1-bc18-d9090a648dff fwd="217.178.26.43" dyno=web.1 connect=0ms service=4ms status=200 bytes=143 protocol=https
+2023-07-17T04:22:05.009167+00:00 app[web.1]: I, [2023-07-17T04:22:05.009110 #2]  INFO -- : [739cf73c-196e-4f59-ae50-2eb55a737fd0] Started GET "/" for 217.178.26.43 at 2023-07-17 04:22:05 +0000
+2023-07-17T04:22:05.009747+00:00 app[web.1]: I, [2023-07-17T04:22:05.009718 #2]  INFO -- : [739cf73c-196e-4f59-ae50-2eb55a737fd0] Processing by UsersController#index as HTML
+2023-07-17T04:22:05.010478+00:00 app[web.1]: I, [2023-07-17T04:22:05.010448 #2]  INFO -- : [739cf73c-196e-4f59-ae50-2eb55a737fd0]   Rendering users/index.html.erb within layouts/application
+2023-07-17T04:22:05.012757+00:00 app[web.1]: D, [2023-07-17T04:22:05.012723 #2] DEBUG -- : [739cf73c-196e-4f59-ae50-2eb55a737fd0]   User Load (1.0ms)  SELECT "users".* FROM "users"
+2023-07-17T04:22:05.012833+00:00 app[web.1]: I, [2023-07-17T04:22:05.012813 #2]  INFO -- : [739cf73c-196e-4f59-ae50-2eb55a737fd0]   Rendered users/index.html.erb within layouts/application (Duration: 2.3ms | Allocations: 257)
+2023-07-17T04:22:05.012943+00:00 app[web.1]: I, [2023-07-17T04:22:05.012909 #2]  INFO -- : [739cf73c-196e-4f59-ae50-2eb55a737fd0] Completed 500 Internal Server Error in 3ms (ActiveRecord: 1.0ms | Allocations: 588)
+2023-07-17T04:22:05.013707+00:00 app[web.1]: F, [2023-07-17T04:22:05.013684 #2] FATAL -- : [739cf73c-196e-4f59-ae50-2eb55a737fd0]
+2023-07-17T04:22:05.013709+00:00 app[web.1]: [739cf73c-196e-4f59-ae50-2eb55a737fd0] ActionView::Template::Error (PG::UndefinedTable: ERROR:  relation "users" does not exist
+2023-07-17T04:22:05.013709+00:00 app[web.1]: LINE 1: SELECT "users".* FROM "users"
+2023-07-17T04:22:05.013709+00:00 app[web.1]: ^
+2023-07-17T04:22:05.013710+00:00 app[web.1]: ):
+2023-07-17T04:22:05.013711+00:00 app[web.1]: [739cf73c-196e-4f59-ae50-2eb55a737fd0]     12:   </thead>
+2023-07-17T04:22:05.013711+00:00 app[web.1]: [739cf73c-196e-4f59-ae50-2eb55a737fd0]     13:
+2023-07-17T04:22:05.013712+00:00 app[web.1]: [739cf73c-196e-4f59-ae50-2eb55a737fd0]     14:   <tbody>
+2023-07-17T04:22:05.013712+00:00 app[web.1]: [739cf73c-196e-4f59-ae50-2eb55a737fd0]     15:     <% @users.each do |user| %>
+2023-07-17T04:22:05.013712+00:00 app[web.1]: [739cf73c-196e-4f59-ae50-2eb55a737fd0]     16:       <tr>
+2023-07-17T04:22:05.013713+00:00 app[web.1]: [739cf73c-196e-4f59-ae50-2eb55a737fd0]     17:         <td><%= user.name %></td>
+2023-07-17T04:22:05.013713+00:00 app[web.1]: [739cf73c-196e-4f59-ae50-2eb55a737fd0]     18:         <td><%= user.email %></td>
+2023-07-17T04:22:05.013713+00:00 app[web.1]: [739cf73c-196e-4f59-ae50-2eb55a737fd0]
+2023-07-17T04:22:05.013714+00:00 app[web.1]: [739cf73c-196e-4f59-ae50-2eb55a737fd0] app/views/users/index.html.erb:15
+2023-07-17T04:22:05.013873+00:00 heroku[router]: at=info method=GET path="/" host=tranquil-tor-32730-10dc03d8ffdc.herokuapp.com request_id=739cf73c-196e-4f59-ae50-2eb55a737fd0 fwd="217.178.26.43" dyno=web.1 connect=0ms service=6ms status=500 bytes=1827 protocol=https
+2023-07-17T04:22:05.294657+00:00 heroku[router]: at=info method=GET path="/favicon.ico" host=tranquil-tor-32730-10dc03d8ffdc.herokuapp.com request_id=9c550059-689c-46a6-9551-a0f554992cff fwd="217.178.26.43" dyno=web.1 connect=0ms service=1ms status=304 bytes=48 protocol=https
+```
+
+## データベースマイグレーションを実行する
+
+```bash
+$ heroku run rails db:migrate
+Running rails db:migrate on ⬢ tranquil-tor-32730... up, run.3731 (Basic)
+D, [2023-07-17T04:28:29.080269 #2] DEBUG -- :    (33.5ms)  CREATE TABLE "schema_migrations" ("version" character varying NOT NULL PRIMARY KEY)
+D, [2023-07-17T04:28:29.087498 #2] DEBUG -- :    (5.5ms)  CREATE TABLE "ar_internal_metadata" ("key" character varying NOT NULL PRIMARY KEY, "value" character varying, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL)
+D, [2023-07-17T04:28:29.122903 #2] DEBUG -- :    (0.6ms)  SELECT pg_try_advisory_lock(1337448099391924485)
+D, [2023-07-17T04:28:29.144716 #2] DEBUG -- :    (0.9ms)  SELECT "schema_migrations"."version" FROM "schema_migrations" ORDER BY "schema_migrations"."version" ASC
+I, [2023-07-17T04:28:29.145565 #2]  INFO -- : Migrating to CreateUsers (20230716103741)
+== 20230716103741 CreateUsers: migrating ======================================
+-- create_table(:users)
+D, [2023-07-17T04:28:29.148107 #2] DEBUG -- :    (0.6ms)  BEGIN
+D, [2023-07-17T04:28:29.156678 #2] DEBUG -- :    (8.5ms)  CREATE TABLE "users" ("id" bigserial primary key, "name" character varying, "email" character varying, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL)
+   -> 0.0095s
+== 20230716103741 CreateUsers: migrated (0.0096s) =============================
+
+D, [2023-07-17T04:28:29.159701 #2] DEBUG -- :   ActiveRecord::SchemaMigration Create (0.7ms)  INSERT INTO "schema_migrations" ("version") VALUES ($1) RETURNING "version"  [["version", "20230716103741"]]
+D, [2023-07-17T04:28:29.161395 #2] DEBUG -- :    (1.6ms)  COMMIT
+I, [2023-07-17T04:28:29.161438 #2]  INFO -- : Migrating to CreateMicroposts (20230717013928)
+== 20230717013928 CreateMicroposts: migrating =================================
+-- create_table(:microposts)
+D, [2023-07-17T04:28:29.162544 #2] DEBUG -- :    (0.5ms)  BEGIN
+D, [2023-07-17T04:28:29.168111 #2] DEBUG -- :    (5.5ms)  CREATE TABLE "microposts" ("id" bigserial primary key, "content" text, "user_id" integer, "created_at" timestamp(6) NOT NULL, "updated_at" timestamp(6) NOT NULL)
+   -> 0.0064s
+== 20230717013928 CreateMicroposts: migrated (0.0064s) ========================
+
+D, [2023-07-17T04:28:29.169080 #2] DEBUG -- :   ActiveRecord::SchemaMigration Create (0.6ms)  INSERT INTO "schema_migrations" ("version") VALUES ($1) RETURNING "version"  [["version", "20230717013928"]]
+D, [2023-07-17T04:28:29.170484 #2] DEBUG -- :    (1.3ms)  COMMIT
+D, [2023-07-17T04:28:29.175458 #2] DEBUG -- :   ActiveRecord::InternalMetadata Load (0.7ms)  SELECT "ar_internal_metadata".* FROM "ar_internal_metadata" WHERE "ar_internal_metadata"."key" = $1 LIMIT $2  [["key", "environment"], ["LIMIT", 1]]
+D, [2023-07-17T04:28:29.180291 #2] DEBUG -- :    (0.8ms)  BEGIN
+D, [2023-07-17T04:28:29.182310 #2] DEBUG -- :   ActiveRecord::InternalMetadata Create (1.4ms)  INSERT INTO "ar_internal_metadata" ("key", "value", "created_at", "updated_at") VALUES ($1, $2, $3, $4) RETURNING "key"  [["key", "environment"], ["value", "production"], ["created_at", "2023-07-17 04:28:29.179158"], ["updated_at", "2023-07-17 04:28:29.179158"]]
+D, [2023-07-17T04:28:29.183568 #2] DEBUG -- :    (1.1ms)  COMMIT
+D, [2023-07-17T04:28:29.184410 #2] DEBUG -- :    (0.7ms)  SELECT pg_advisory_unlock(1337448099391924485)
+```
+
+##
