@@ -1906,4 +1906,403 @@ Running via Spring preloader in process 70329
       create      app/assets/stylesheets/static_pages.scss
 ```
 
+## Node バージョンの調整
+
+```bash
+// node 14 にダウングレード
+$ nvm use lts/fermium
+Now using node v14.21.3 (npm v6.14.18)
+glaciermelt (i386):/Volumes/dev/git-dev/rails/sample_app (feature/2023-07-17-static-pages|✚1)$ bundle _2.2.17_ update
+Fetching gem metadata from https://rubygems.org/...........
+Resolving dependencies........
+Using rake 12.3.3
+Using concurrent-ruby 1.2.2
+Using minitest 5.11.3
+Using thread_safe 0.3.6
+Using zeitwerk 2.6.8
+Using builder 3.2.4
+Using erubi 1.12.0
+Using racc 1.7.1
+Using crass 1.0.6
+Using rack 2.2.7
+Using bindex 0.8.1
+Using websocket-extensions 0.1.5
+Using marcel 1.0.2
+Using bundler 2.2.17
+Using byebug 11.0.1
+Using regexp_parser 1.8.2
+Using childprocess 2.0.0
+Using coderay 1.1.3
+Using ffi 1.15.5
+Using formatador 1.1.0
+Using rb-fsevent 0.11.2
+Using ruby_dep 1.5.0
+Using lumberjack 1.2.8
+Using nenv 0.3.0
+Using shellany 0.0.1
+Using method_source 1.0.0
+Using thor 1.2.2
+Using guard-compat 1.2.1
+Using ruby-progressbar 1.13.0
+Using uri 0.12.2
+Using rubyzip 1.3.0
+Using tilt 2.2.0
+Using spring 2.1.0
+Using sqlite3 1.4.2
+Using turbolinks-source 5.2.0
+Using i18n 1.14.1
+Using tzinfo 1.2.11
+Using nokogiri 1.15.3 (x86_64-darwin)
+Using rack-test 2.1.0
+Using rack-proxy 0.7.6
+Using sprockets 3.7.2
+Using mini_mime 1.1.2
+Using date 3.3.3
+Using activesupport 6.0.4
+Using public_suffix 5.0.3
+Using loofah 2.21.3
+Using websocket-driver 0.7.5
+Using xpath 3.2.0
+Using rb-inotify 0.10.1
+Using notiffany 0.1.3
+Using pry 0.14.2
+Using guard-minitest 2.4.6
+Using net-http 0.3.2
+Using selenium-webdriver 3.142.4
+Using turbolinks 5.2.0
+Using timeout 0.4.0
+Using ansi 1.5.0
+Using rails-html-sanitizer 1.6.0
+Using net-protocol 0.2.1
+Using listen 3.1.5
+Using sass-listen 4.0.0
+Using webdrivers 4.1.2
+Using msgpack 1.7.1
+Using nio4r 2.5.9
+Using rails-dom-testing 2.1.1
+Using globalid 1.1.0
+Using activemodel 6.0.4
+Using net-imap 0.3.6
+Using net-pop 0.1.2
+Using net-smtp 0.3.3
+Using addressable 2.8.4
+Using bootsnap 1.10.3
+Using guard 2.16.2
+Using jbuilder 2.9.1
+Using minitest-reporters 1.3.8
+Using puma 4.3.6
+Using sass 3.7.4
+Using spring-watcher-listen 2.0.1
+Using actionview 6.0.4
+Using activejob 6.0.4
+Using activerecord 6.0.4
+Using mail 2.8.1
+Using capybara 3.28.0
+Using actionpack 6.0.4
+Using actioncable 6.0.4
+Using activestorage 6.0.4
+Using actionmailer 6.0.4
+Using railties 6.0.4
+Using actionmailbox 6.0.4
+Using actiontext 6.0.4
+Using rails-controller-testing 1.0.4
+Using sprockets-rails 3.4.2
+Using web-console 4.0.1
+Using webpacker 4.0.7
+Using rails 6.0.4
+Using sass-rails 5.1.0
+Bundle updated!
+Gems in the group 'production' were not updated.
+
+// yarn install
+$ yarn install
+yarn install v1.22.19
+[1/4] 🔍  Resolving packages...
+[2/4] 🚚  Fetching packages...
+[3/4] 🔗  Linking dependencies...
+warning "webpack-dev-server > webpack-dev-middleware@5.3.3" has unmet peer dependency "webpack@^4.0.0 || ^5.0.0".
+[4/4] 🔨  Building fresh packages...
+✨  Done in 10.96s.
+
+// webpacker のインストール
+$ rails webpacker:install
+    conflict  config/webpacker.yml
+Overwrite /Volumes/dev/git-dev/rails/sample_app/config/webpacker.yml? (enter "h" for help) [Ynaqdhm] n
+        skip  config/webpacker.yml
+Copying webpack core config
+       exist  config/webpack
+   identical  config/webpack/development.js
+   identical  config/webpack/environment.js
+   identical  config/webpack/production.js
+   identical  config/webpack/test.js
+Copying postcss.config.js to app root directory
+   identical  postcss.config.js
+Copying babel.config.js to app root directory
+    conflict  babel.config.js
+Overwrite /Volumes/dev/git-dev/rails/sample_app/babel.config.js? (enter "h" for help) [Ynaqdhm] n
+        skip  babel.config.js
+Copying .browserslistrc to app root directory
+   identical  .browserslistrc
+The JavaScript app source directory already exists
+       apply  /Users/glaciermelt/.rvm/gems/ruby-2.7.6/gems/webpacker-4.0.7/lib/install/binstubs.rb
+  Copying binstubs
+       exist    bin
+    conflict    bin/webpack
+  Overwrite /Volumes/dev/git-dev/rails/sample_app/bin/webpack? (enter "h" for help) [Ynaqdhm] n
+        skip    bin/webpack
+    conflict    bin/webpack-dev-server
+  Overwrite /Volumes/dev/git-dev/rails/sample_app/bin/webpack-dev-server? (enter "h" for help) [Ynaqdhm] n
+        skip    bin/webpack-dev-server
+File unchanged! Either the supplied flag value not found or the content has already been inserted!  .gitignore
+Installing all JavaScript dependencies [4.0.7]
+         run  yarn add @rails/webpacker from "."
+yarn add v1.22.19
+[1/4] 🔍  Resolving packages...
+[2/4] 🚚  Fetching packages...
+[3/4] 🔗  Linking dependencies...
+warning "webpack-dev-server > webpack-dev-middleware@5.3.3" has unmet peer dependency "webpack@^4.0.0 || ^5.0.0".
+[4/4] 🔨  Building fresh packages...
+success Saved 1 new dependency.
+info Direct dependencies
+└ @rails/webpacker@5.4.4
+info All dependencies
+└ @rails/webpacker@5.4.4
+✨  Done in 2.44s.
+Installing dev server for live reloading
+         run  yarn add --dev webpack-dev-server from "."
+yarn add v1.22.19
+[1/4] 🔍  Resolving packages...
+[2/4] 🚚  Fetching packages...
+[3/4] 🔗  Linking dependencies...
+warning "webpack-dev-server > webpack-dev-middleware@5.3.3" has unmet peer dependency "webpack@^4.0.0 || ^5.0.0".
+[4/4] 🔨  Building fresh packages...
+success Saved 1 new dependency.
+info Direct dependencies
+└ webpack-dev-server@4.15.1
+info All dependencies
+└ webpack-dev-server@4.15.1
+✨  Done in 2.15s.
+Webpacker successfully installed 🎉 🍰
+```
+
+## テストの実行
+
+```bash
+$ rails db:migrate
+$ rails test
+Running via Spring preloader in process 70364
+Run options: --seed 54206
+
+# Running:
+
+..
+
+Finished in 2.706464s, 0.7390 runs/s, 0.7390 assertions/s.
+2 runs, 2 assertions, 0 failures, 0 errors, 0 skips
+```
+
+## About ページのテスト
+
+```ruby
+# test/controllers/static_pages_controller_test.rb
+
+  test "should get about" do
+    get static_pages_about_url
+    assert_response :success
+  end
+```
+
+```bash
+$ rails test
+Running via Spring preloader in process 81469
+Run options: --seed 20903
+
+# Running:
+
+E
+
+Error:
+StaticPagesControllerTest#test_should_get_about:
+NameError: undefined local variable or method `static_pages_about_url' for #<StaticPagesControllerTest:0x00007fe4a85fd630>
+    test/controllers/static_pages_controller_test.rb:15:in `block in <class:StaticPagesControllerTest>'
+
+
+rails test test/controllers/static_pages_controller_test.rb:14
+
+..
+
+Finished in 0.832785s, 3.6024 runs/s, 2.4016 assertions/s.
+3 runs, 2 assertions, 0 failures, 1 errors, 0 skips
+```
+
+## About ページへのルーティング追加
+
+```ruby
+# config/routes.rb
+
+  get  'static_pages/about'
+```
+
+```bash
+$ rails test
+Running via Spring preloader in process 94026
+Run options: --seed 6122
+
+# Running:
+
+E
+
+Error:
+StaticPagesControllerTest#test_should_get_about:
+AbstractController::ActionNotFound: The action 'about' could not be found for StaticPagesController
+    test/controllers/static_pages_controller_test.rb:15:in `block in <class:StaticPagesControllerTest>'
+
+
+rails test test/controllers/static_pages_controller_test.rb:14
+
+..
+
+Finished in 0.859043s, 3.4923 runs/s, 2.3282 assertions/s.
+3 runs, 2 assertions, 0 failures, 1 errors, 0 skips
+```
+
+## About アクションの追加
+
+```ruby
+# app/controllers/static_pages_controller.rb
+
+  def about
+  end
+```
+
+```bash
+$ rails test
+Running via Spring preloader in process 2127
+Run options: --seed 62478
+
+# Running:
+
+E
+
+Error:
+StaticPagesControllerTest#test_should_get_about:
+ActionController::MissingExactTemplate: StaticPagesController#about is missing a template for request formats: text/html
+    test/controllers/static_pages_controller_test.rb:15:in `block in <class:StaticPagesControllerTest>'
+
+
+rails test test/controllers/static_pages_controller_test.rb:14
+
+..
+
+Finished in 0.856651s, 3.5020 runs/s, 2.3347 assertions/s.
+3 runs, 2 assertions, 0 failures, 1 errors, 0 skips
+```
+
+## About ビューの追加
+
+```bash
+$ touch app/views/static_pages/about.html.erb
+```
+
+```ruby
+# app/views/static_pages/about.html.erb
+
+<h1>About</h1>
+<p>
+  <a href="https://railstutorial.jp/">Ruby on Rails Tutorial</a>
+  is a <a href="https://railstutorial.jp/#ebook">book</a> and
+  <a href="https://railstutorial.jp/screencast">screencast</a>
+  to teach web development with
+  <a href="https://rubyonrails.org/">Ruby on Rails</a>.
+  This is the sample application for the tutorial.
+</p>
+
+```
+
+```bash
+$ rails test
+Running via Spring preloader in process 15608
+Run options: --seed 27252
+
+# Running:
+
+...
+
+Finished in 0.903032s, 3.3221 runs/s, 3.3221 assertions/s.
+3 runs, 3 assertions, 0 failures, 0 errors, 0 skips
+```
+
+## レイアウトファイル名の変更
+
+```bash
+$ mv app/views/layouts/application.html.erb layout_file
+```
+
+## タイトルテストの追加
+
+```ruby
+# test/controllers/static_pages_controller_test.rb
+
+  test "should get home" do
+    get static_pages_home_url
+    assert_response :success
+    assert_select "title", "Home | Ruby on Rails Tutorial Sample App"    
+  end
+
+  test "should get help" do
+    get static_pages_help_url
+    assert_response :success
+    assert_select "title", "Help | Ruby on Rails Tutorial Sample App"
+  end
+
+  test "should get about" do
+    get static_pages_about_url
+    assert_response :success
+    assert_select "title", "About | Ruby on Rails Tutorial Sample App"
+  end
+```
+
+```bash
+$ rails test
+Running via Spring preloader in process 47626
+Run options: --seed 25886
+
+# Running:
+
+F
+
+Failure:
+StaticPagesControllerTest#test_should_get_help [/Volumes/dev/git-dev/rails/sample_app/test/controllers/static_pages_controller_test.rb:13]:
+Expected at least 1 element matching "title", found 0.
+Expected 0 to be >= 1.
+
+
+rails test test/controllers/static_pages_controller_test.rb:10
+
+F
+
+Failure:
+StaticPagesControllerTest#test_should_get_home [/Volumes/dev/git-dev/rails/sample_app/test/controllers/static_pages_controller_test.rb:7]:
+Expected at least 1 element matching "title", found 0.
+Expected 0 to be >= 1.
+
+
+rails test test/controllers/static_pages_controller_test.rb:4
+
+F
+
+Failure:
+StaticPagesControllerTest#test_should_get_about [/Volumes/dev/git-dev/rails/sample_app/test/controllers/static_pages_controller_test.rb:19]:
+Expected at least 1 element matching "title", found 0.
+Expected 0 to be >= 1.
+
+
+rails test test/controllers/static_pages_controller_test.rb:16
+
+
+
+Finished in 0.112706s, 26.6179 runs/s, 53.2359 assertions/s.
+3 runs, 6 assertions, 3 failures, 0 errors, 0 skips
+```
+
 ##
