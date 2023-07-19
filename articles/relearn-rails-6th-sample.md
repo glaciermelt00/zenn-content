@@ -2305,4 +2305,133 @@ Finished in 0.112706s, 26.6179 runs/s, 53.2359 assertions/s.
 3 runs, 6 assertions, 3 failures, 0 errors, 0 skips
 ```
 
+## ビューにタイトルを追加
+
+```ruby
+# app/views/static_pages/home.html.erb
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Home | Ruby on Rails Tutorial Sample App</title>
+  </head>
+  <body>
+    <h1>Sample App</h1>
+    <p>
+      This is the home page for the
+      <a href="https://railstutorial.jp/">Ruby on Rails Tutorial</a>
+      sample application.
+    </p>
+  </body>
+</html>
+```
+
+```bash
+$ rails test
+Running via Spring preloader in process 57541
+Run options: --seed 39670
+
+# Running:
+
+...
+
+Finished in 0.089336s, 33.5811 runs/s, 67.1622 assertions/s.
+3 runs, 6 assertions, 0 failures, 0 errors, 0 skips
+```
+
+## 基本タイトルを使ってテストを記述
+
+```ruby
+# test/controllers/static_pages_controller_test.rb
+
+class StaticPagesControllerTest < ActionDispatch::IntegrationTest
+
+  def setup
+    @base_title = "Ruby on Rails Tutorial Sample App"
+  end
+
+  test "should get home" do
+    get static_pages_home_url
+    assert_response :success
+    assert_select "title", "Home | #{@base_title}"
+  end
+
+  test "should get help" do
+    get static_pages_help_url
+    assert_response :success
+    assert_select "title", "Help | #{@base_title}"
+  end
+
+  test "should get about" do
+    get static_pages_about_url
+    assert_response :success
+    assert_select "title", "About | #{@base_title}"
+  end
+end
+```
+
+```bash
+$ rails test
+Running via Spring preloader in process 73760
+Run options: --seed 1972
+
+# Running:
+
+...
+
+Finished in 0.105068s, 28.5529 runs/s, 57.1059 assertions/s.
+3 runs, 6 assertions, 0 failures, 0 errors, 0 skips
+```
+
+## タイトルを provide と yield で表現
+
+```ruby
+# app/views/static_pages/home.html.erb
+
+<% provide(:title, "Home") %>
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= yield(:title) %> | Ruby on Rails Tutorial Sample App</title>
+  </head>
+```
+
+```bash
+$ rails t
+Running via Spring preloader in process 29165
+Run options: --seed 19653
+
+# Running:
+
+...
+
+Finished in 0.095720s, 31.3414 runs/s, 62.6828 assertions/s.
+3 runs, 6 assertions, 0 failures, 0 errors, 0 skips
+```
+
+## レイアウトファイル名を元に戻す
+
+```bash
+$ mv layout_file app/views/layouts/application.html.erb
+```
+
+## レイアウトファイルで yield を定義する
+
+```ruby
+# app/views/layouts/application.html.erb
+
+    <title><%= yield(:title) %> | Ruby on Rails Tutorial Sample App</title>
+```
+
+## ルーティングの設定
+
+```ruby
+# config/routes
+
+Rails.application.routes.draw do
+  root 'static_pages#home'
+```
+
+## 
+
 ##
