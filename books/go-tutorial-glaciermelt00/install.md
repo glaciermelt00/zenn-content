@@ -1,3 +1,6 @@
+---
+title: "Go のインストール"
+---
 
 reference: https://go.dev/doc/manage-install
 
