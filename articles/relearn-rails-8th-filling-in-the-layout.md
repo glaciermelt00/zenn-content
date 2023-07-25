@@ -532,4 +532,277 @@ footer {
 }
 ```
 
+# 5.3 レイアウトのリンク
+
+下記のようにリンクを直接記述することもできるが、 Rails 竜ではない。
+
+```ruby
+<a href="/static_pages/about">About</a>
+```
+
+Rails では `名前付きルート` を使うのが慣例となっている。
+
+```ruby
+<%= link_to "About", about_path %>
+```
+
+`about_path` の定義を変えれば URL を変更できるので、柔軟性が高まる。
+
+## 5.3.1 Contact ページ
+
+演習で既に実装済みのため、スキップ。
+
+## 5.3.2 Rails のルート URL
+
+ルート URL を定義すると、下記のメソッドで URL を参照できる。
+
+- `root_path`: ルート URL 以下の文字列を返す
+- `root_url`: 完全な URL の文字列を返す。
+
+```
+root_path -> '/'
+root_url  -> 'https://www.example.com/'
+```
+
+Rails では基本的に `_path` 書式を使い、リダイレクトの場合のみ `_url` 書式を使う。
+
+`get` ルールで名前付きルートを使う。
+
+```ruby
+# 元のルーティング
+get 'static_pages/help'
+
+# 名前付きルートを使う
+get 'help', to: 'static_pages#help'
+```
+
+ルーティングを名前付きルートを使って定義し直す。
+
+```ruby
+# config/routes.rb
+
+Rails.application.routes.draw do
+  root 'static_pages#home'
+  get '/helop',   to: 'static_pages#help'
+  get '/about',   to: 'static_pages#about'
+  get '/contact', to: 'static_pages#contact'
+end
+```
+
+テストを実行する。
+
+```bash
+09:13:01 - INFO - Running: test/controllers//static_pages_controller_test.rb
+Running via Spring preloader in process 32283
+Started with run options --seed 5667
+
+ERROR["test_should_get_help", #<Minitest::Reporters::Suite:0x00007fdfa45ebd30 @name="StaticPagesControllerTest">, 0.05688600009307265]
+ test_should_get_help#StaticPagesControllerTest (0.06s)
+NameError:         NameError: undefined local variable or method `static_pages_help_url' for #<StaticPagesControllerTest:0x00007fdfa45f8288>
+            test/controllers/static_pages_controller_test.rb:21:in `block in <class:StaticPagesControllerTest>'
+
+ERROR["test_should_get_home", #<Minitest::Reporters::Suite:0x00007fdfa45dacd8 @name="StaticPagesControllerTest">, 0.058307000203058124]
+ test_should_get_home#StaticPagesControllerTest (0.06s)
+NameError:         NameError: undefined local variable or method `static_pages_home_url' for #<StaticPagesControllerTest:0x00007fdfa45f8288>
+            test/controllers/static_pages_controller_test.rb:15:in `block in <class:StaticPagesControllerTest>'
+
+ERROR["test_should_get_contact", #<Minitest::Reporters::Suite:0x00007fdfa45d0ad0 @name="StaticPagesControllerTest">, 0.05869600013829768]
+ test_should_get_contact#StaticPagesControllerTest (0.06s)
+NameError:         NameError: undefined local variable or method `static_pages_contact_url' for #<StaticPagesControllerTest:0x00007fdfa45f8288>
+            test/controllers/static_pages_controller_test.rb:33:in `block in <class:StaticPagesControllerTest>'
+
+ERROR["test_should_get_about", #<Minitest::Reporters::Suite:0x00007fdfa45c38d0 @name="StaticPagesControllerTest">, 0.05893800011835992]
+ test_should_get_about#StaticPagesControllerTest (0.06s)
+NameError:         NameError: undefined local variable or method `static_pages_about_url' for #<StaticPagesControllerTest:0x00007fdfa45f8288>
+            test/controllers/static_pages_controller_test.rb:27:in `block in <class:StaticPagesControllerTest>'
+
+  4/4: [===================================================================================================================================================================================================================================================================================================================================================================================================================================================================] 100% Time: 00:00:00, Time: 00:00:00
+
+Finished in 0.09821s
+4 tests, 0 assertions, 0 failures, 4 errors, 0 skips
+```
+
+テストを修正する。
+
+```ruby
+# test/controllers/static_pages_controller_test.rb
+
+class StaticPagesControllerTest < ActionDispatch::IntegrationTest
+  .
+  .
+  .
+  test "should get home" do
+    get root_path
+    .
+    .
+    .
+  end
+
+  test "should get help" do
+    get help_path
+    .
+    .
+    .
+  end
+
+  test "should get about" do
+    get about_path
+    .
+    .
+    .
+  end
+
+  test "should get contact" do
+    get contact_path
+    .
+    .
+    .
+  end
+end
+```
+
+テストを実行する。
+
+```bash
+09:17:35 - INFO - Run all
+09:17:35 - INFO - Running: all tests
+Running via Spring preloader in process 58351
+Started with run options --seed 52607
+
+  4/4: [===================================================================================================================================================================================================================================================================================================================================================================================================================================================================] 100% Time: 00:00:00, Time: 00:00:00
+
+Finished in 0.92602s
+4 tests, 8 assertions, 0 failures, 0 errors, 0 skips
+```
+
+### 演習
+
+#### 1.
+
+`as:` オプションを使って、 Help ページの名前付きルートを `helf` に変更する。
+
+```ruby
+# config/routes.rb
+
+  get '/help',    to: 'static_pages#help',   as: 'helf'
+```
+
+#### 2.
+
+先程の変更により、テストが `RED` となる。
+
+```bash
+09:19:06 - INFO - Running: test/controllers//static_pages_controller_test.rb
+Running via Spring preloader in process 67078
+Started with run options --seed 64961
+
+ERROR["test_should_get_help", #<Minitest::Reporters::Suite:0x00007fbe05c3f800 @name="StaticPagesControllerTest">, 0.060252000112086535]
+ test_should_get_help#StaticPagesControllerTest (0.06s)
+NameError:         NameError: undefined local variable or method `help_path' for #<StaticPagesControllerTest:0x00007fbe05c4c438>
+            test/controllers/static_pages_controller_test.rb:21:in `block in <class:StaticPagesControllerTest>'
+
+  4/4: [===================================================================================================================================================================================================================================================================================================================================================================================================================================================================] 100% Time: 00:00:00, Time: 00:00:00
+
+Finished in 0.88409s
+4 tests, 6 assertions, 0 failures, 1 errors, 0 skips
+```
+
+ルーティングを変更する。
+
+```ruby
+# test/controllers/static_pages_controller_test.rb
+
+  test "should get help" do
+    get helf_path
+```
+
+テストが `GREEN` となる。
+
+```bash
+09:21:29 - INFO - Running: test/controllers/static_pages_controller_test.rb
+Running via Spring preloader in process 81181
+Started with run options --seed 43102
+
+  4/4: [===================================================================================================================================================================================================================================================================================================================================================================================================================================================================] 100% Time: 00:00:00, Time: 00:00:00
+
+Finished in 0.91977s
+4 tests, 8 assertions, 0 failures, 0 errors, 0 skips
+```
+
+#### 3.
+
+上記の変更をもとに戻す。
+
+
+## 5.3.3 名前付きルート
+
+`link_to` メソッドの2番めの引数に、適切な名前付きルートを使う。
+
+```ruby
+# 元のコード
+<%= link_to "About", '#' %>
+
+# 名前付きルートを使う
+<%= link_to "About", about_path %>
+```
+
+まず、 header パーシャルのリンクを変更する。
+
+```ruby
+# app/views/layouts/_header.html.erb
+
+    <%= link_to "sample app", root_path, id: "logo" %>
+    <nav>
+      <ul class="nav navbar-nav navbar-right">
+        <li><%= link_to "Home",   root_path %></li>
+        <li><%= link_to "Help",   help_path %></li>
+```
+
+footer パーシャルのリンクも変更する。
+
+```ruby
+# app/views/layouts/_footer.html.erb
+
+      <li><%= link_to "About",   about_path %></li>
+      <li><%= link_to "Contact", contact_path %></li>
+```
+
+
+## 5.3.4 リンクのテスト
+
+`統合テスト ( *Integration Test* )` を導入するため、 `site_layout` とうテストのテンプレートを生成する。
+
+```bash
+$ rails generate integration_test site_layout
+Running via Spring preloader in process 39064
+      invoke  test_unit
+      create    test/integration/site_layout_test.rb
+```
+
+レイアウトの各リンクが正しく動くかどうかチェックする。
+
+1. ルート URL (Home ページ) に GET リクエストを送る
+2. 正しいページテンプレートが描画されているかどうか確かめる
+3. Home, Help, About, Contact の各ページへのリンクが正しく動くか確かめる
+
+`assert_template` メソッドを使って、 Home ページが正しいビューを描画しているかどうか確かめる。
+
+```ruby
+# test/integration/site_layout_test.rb
+
+require 'test_helper'
+
+class SiteLayoutTest < ActionDispatch::IntegrationTest
+
+  test "layout links" do
+    get root_path
+    assert_template 'static_pages/home'
+    assert_select "a[href=?]", root_path, count: 2
+    assert_select "a[href=?]", help_path
+    assert_select "a[href=?]", about_path
+    assert_select "a[href=?]", contact_path
+  end
+end
+```
+
 #
