@@ -925,7 +925,221 @@ Finished in 0.94624s
 新規ユーザー用のユーザー登録ページ向けのコントローラを作成する。
 
 ```bash
-
+$ rails generate controller Users new
+Running via Spring preloader in process 40757
+      create  app/controllers/users_controller.rb
+       route  get 'users/new'
+      invoke  erb
+      create    app/views/users
+      create    app/views/users/new.html.erb
+      invoke  test_unit
+      create    test/controllers/users_controller_test.rb
+      invoke  helper
+      create    app/helpers/users_helper.rb
+      invoke    test_unit
+      invoke  assets
+      invoke    scss
+      create      app/assets/stylesheets/users.scss
 ```
 
-#
+上記により、Users コントローラとユーザービュー、テストが作成される。
+
+```ruby
+# app/controllers/users_controller.rb
+
+class UsersController < ApplicationController
+  def new
+  end
+end
+```
+
+```ruby
+# app/views/users/new.html.erb
+
+<h1>Users#new</h1>
+<p>Find me in app/views/users/new.html.erb</p>
+```
+
+```ruby
+# test/controllers/users_controller_test.rb
+
+require 'test_helper'
+
+class UsersControllerTest < ActionDispatch::IntegrationTest
+  test "should get new" do
+    get users_new_url
+    assert_response :success
+  end
+
+end
+```
+
+テストがパスすることを確認する。
+
+```bash
+$ rails test
+Running via Spring preloader in process 58489
+Started with run options --seed 42516
+
+  7/7: [===================================================================================================================================================================================================================================================================================================================================================================================================================================================================] 100% Time: 00:00:02, Time: 00:00:02
+
+Finished in 2.88587s
+7 tests, 17 assertions, 0 failures, 0 errors, 0 skips
+```
+
+### 演習
+
+#### 1.
+
+ルーティングで `signup_path` を定義する。
+
+```ruby
+# config/routes.rb
+
+Rails.application.routes.draw do
+  .
+  .
+  .
+  get '/signup',  to: 'users#new'
+end
+```
+
+#### 2.
+
+テストを実行する。
+
+```bash
+$ rails test
+Running via Spring preloader in process 86938
+Started with run options --seed 48772
+
+ERROR["test_should_get_new", #<Minitest::Reporters::Suite:0x00007f9fd59daf18 @name="UsersControllerTest">, 0.058170000091195107]
+ test_should_get_new#UsersControllerTest (0.06s)
+NameError:         NameError: undefined local variable or method `users_new_url' for #<UsersControllerTest:0x00007f9fd5a09ae8>
+            test/controllers/users_controller_test.rb:5:in `block in <class:UsersControllerTest>'
+
+  7/7: [===================================================================================================================================================================================================================================================================================================================================================================================================================================================================] 100% Time: 00:00:00, Time: 00:00:00
+
+Finished in 0.92062s
+7 tests, 16 assertions, 0 failures, 1 errors, 0 skips
+```
+
+テストで `signup_path` を使用する。
+
+```ruby
+# test/controllers/users_controller_test.rb
+
+  test "should get new" do
+    get signup_path
+    assert_response :success
+  end
+```
+
+再度テストを実行する。
+
+```bash
+rails test
+Running via Spring preloader in process 81632
+Started with run options --seed 33177
+
+  7/7: [===================================================================================================================================================================================================================================================================================================================================================================================================================================================================] 100% Time: 00:00:00, Time: 00:00:00
+
+Finished in 0.93784s
+7 tests, 17 assertions, 0 failures, 0 errors, 0 skips
+```
+
+
+## 5.4.2 ユーザー登録用 URL
+
+ユーザー登録 URL ように `get '/signup'` のルーティングを追加する。
+
+```ruby
+# config/routes.rb
+
+Rails.application.routes.draw do
+  .
+  .
+  .
+  get '/signup',  to: 'users#new'
+end
+```
+
+テストを修正する。
+
+```ruby
+# test/controllers/users_controller_test.rb
+
+  test "should get new" do
+    get signup_path
+    assert_response :success
+  end
+```
+
+Home ページのボタンに `signup_path` を追加する。
+
+```ruby
+# app/views/static_pages/home.html.erb
+
+  <%= link_to "Sign up now!", signup_path, class: "btn btn-lg btn-primary" %>
+```
+
+最後に、signup ページ用のカスタムスタブのビューを追加する。
+
+```ruby
+# app/views/users/new.html.erb
+
+<% provide(:title, 'Sign up') %>
+<h1>Sign up</h1>
+<p>This will be a signup page for new users.</p>
+```
+
+### 演習
+
+#### 1.
+
+`signup_path` は実装済みのため、スキップ。
+
+#### 2.
+
+こちらも同様にスキップ。
+
+#### 3.
+
+統合テストに Sign up ページでのテストを追加する。
+
+```ruby
+# test/integration/site_layout_test.rb
+
+  test "layout links" do
+    .
+    .
+    .
+    get signup_path
+    assert_select "title", full_title("Sign up")
+  end
+```
+
+テストを実行する。
+
+```bash
+$ rails test
+Running via Spring preloader in process 85774
+Started with run options --seed 22524
+
+  7/7: [===================================================================================================================================================================================================================================================================================================================================================================================================================================================================] 100% Time: 00:00:01, Time: 00:00:01
+
+Finished in 1.06477s
+7 tests, 18 assertions, 0 failures, 0 errors, 0 skips
+```
+
+# 5.5 最後に
+
+## 5.5.1 本章のまとめ
+
+- HTML5 を使って header や footer、 logo や body といったコンテンツのレイアウトを定義した
+- Rails のパーシャルは効率化のために使われ、別ファイルにマークアップを切り出すことができる
+- CSS は、 CSS クラスと id を使ってレイアウトやデザインを調整する
+- Bootstrap フレームワークを使うと、いい感じのデザインを素早く実装できる
+- Sass と Asset Pipeline は、(開発効率のために切り分けられた) CSS の冗長な部分を圧縮し、本番環境に最適化した結果を出力する
+- Rails のルーティングでは自由にルールを定義することができ、また、その際に名前付きルートも使えるようになる
+- 統合テストは、ブラウザによるページ間の遷移を効率的にシミュレートする
