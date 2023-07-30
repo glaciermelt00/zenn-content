@@ -178,3 +178,119 @@ $ rails db:migrate
 == 20230728235745 CreateUsers: migrated (0.0017s) =============================
 ```
 
+## 6.1.2 model ファイル
+
+`app/models/` ディレクトリの `user.rb` ファイルで定義している User モデルは下記の通り。
+
+```ruby
+# app/models/user.rb
+
+class User < ApplicationRecord
+end
+```
+
+### 演習
+
+#### 1.
+
+Rails コンソールで `User` クラスのオブジェクトを確認する。
+
+```bash
+>> user = User.new
+   (0.8ms)  SELECT sqlite_version(*)
+=> #<User id: nil, name: nil, email: nil, created_at: nil, updated_at: nil>
+>> user.class
+=> User(id: integer, name: string, email: string, created_at: datetime, updated_at: datetime)
+>> user.class.superclass
+=> ApplicationRecord(abstract)
+```
+
+`User` クラスが `ApplicationRecord` を継承していることが分かる。
+
+#### 2.
+
+`User` クラスのオブジェクトの継承関係を確認する。
+
+```bash
+>> user = User.new
+   (0.8ms)  SELECT sqlite_version(*)
+=> #<User id: nil, name: nil, email: nil, created_at: nil, updated_at: nil>
+>> user.class
+=> User(id: integer, name: string, email: string, created_at: datetime, updated_at: datetime)
+>> user.class.superclass
+=> ApplicationRecord(abstract)
+>> user.class.superclass.superclass
+=> ActiveRecord::Base
+```
+
+`ApplicationRecord` が `ActiveRecord::Base` を継承していることが分かる。
+
+## 6.1.3 ユーザーオブジェクトを作成する
+
+Rails コンソールを *サンドボックス* モードで起動する。
+
+```bash
+$ rails c --sandbox
+Running via Spring preloader in process 63183
+Loading development environment in sandbox (Rails 6.0.4)
+Any modifications you make will be rolled back on exit
+>>
+```
+
+モデルが定義されている場合、Rails コンソールで使用できる。
+
+```bash
+>> User.new
+   (0.1ms)  begin transaction
+=> #<User id: nil, name: nil, email: nil, created_at: nil, updated_at: nil>
+```
+
+`User.new` に *初期化ハッシュ (hash)* を引数に取ると、オブジェクトの属性を設定できる。
+
+```bash
+>> user = User.new(name: "Michael Hartl", email: "michael@example.com")
+=> #<User id: nil, name: "Michael Hartl", email: "michael@example.com", created_at: nil, updated_at: nil>
+```
+
+`user` オブジェクトの *有効性 (Validity)* を確認する。
+
+```bash
+>> user.valid?
+=> true
+```
+
+`user` オブジェクトから `save` メソッドを呼び出す。
+
+```bash
+>> user.save
+   (0.1ms)  SAVEPOINT active_record_1
+  User Create (0.5ms)  INSERT INTO "users" ("name", "email", "created_at", "updated_at") VALUES (?, ?, ?, ?)  [["name", "Michael Hartl"], ["email", "michael@example.com"], ["created_at", "2023-07-30 13:52:50.337234"], ["updated_at", "2023-07-30 13:52:50.337234"]]
+   (0.0ms)  RELEASE SAVEPOINT active_record_1
+=> true
+```
+
+`save` メソッドを実行した後の `user` オブジェクトを確認する。
+
+```bash
+>> user
+=> #<User id: 1, name: "Michael Hartl", email: "michael@example.com", created_at: "2023-07-30 13:52:50", updated_at: "2023-07-30 13:52:50">
+```
+
+`User` モデルのインスタンスは、ドット記法を用いてその属性にアクセスできる。
+
+```bash
+>> user.name
+=> "Michael Hartl"
+>> user.email
+=> "michael@example.com"
+>> user.updated_at
+=> Sun, 30 Jul 2023 13:52:50 UTC +00:00
+```
+
+Active Record では `User.create` でモデルの生成と保存を同時に行える。
+
+```bash
+
+```
+
+
