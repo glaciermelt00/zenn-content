@@ -11,7 +11,7 @@ title: "ORM: gorm x PostgreSQL で JSON データを読み書きする方法"
 
 - [公式ドキュメント](https://gorm.io/docs/data_types.html#Implements-Customized-Data-Type)では、下記のサンプルコードが掲載されている。
 
-```
+```go
 type JSON json.RawMessage
 
 // Scan scan value into Jsonb, implements sql.Scanner interface
