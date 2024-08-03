@@ -8,4 +8,4 @@ chapters:
   - return-greetings-for-multiple-people # https://go.dev/doc/tutorial/greetings-multiple-people
   - install
   - example-gin
-
+  - orm-json
