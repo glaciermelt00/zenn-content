@@ -1,134 +1,445 @@
 ---
-title: "Kubernetes で Taint/Toleration と Affinity を活用した Pod 配置戦略"
+title: "【図解】Kubernetes で Pod を狙った場所に配置する方法 - Taint/Toleration と Affinity 入門"
 emoji: "🎯"
 type: "tech"
-topics: ["kubernetes", "karpenter", "eks", "devops", "infrastructure"]
+topics: ["kubernetes", "karpenter", "eks", "devops", "初心者"]
 published: false
 ---
 
 ## はじめに
 
-Kubernetes クラスタにおいて、ワークロードの特性に応じて Node を適切に管理し、Pod を意図したノードに配置することは、リソースの最適化やコスト削減、運用効率の向上に繋がります。
+Kubernetes を使っていると、「この Pod はこのサーバーに配置したい」という要望が出てきます。
 
-本記事では、Operators Pod（ArgoCD、Datadog など）と Services Pod（アプリケーション）を明確に分離し、それぞれを異なるノードグループに配置する方法について解説します。
+例えば、
 
-## 背景と目的
+- **運用ツール（ArgoCD や Datadog など）** → 安定したサーバーに配置したい
+- **アプリケーション** → コストを抑えるためにスケールしやすいサーバーに配置したい
 
-ワークロードを以下の 2 種類に分類し、それぞれ異なる Node で管理する方針とします。
+本記事では、**図やイラストを使って初心者向けに**、Pod を狙った場所に配置する方法を解説します。
 
-- **Operators Pod**：クラスタ管理やモニタリングなどの運用系ワークロード（ArgoCD、Datadog など）
-- **Services Pod**：ビジネスロジックを担うアプリケーションワークロード
+:::message
+**この記事でわかること**
 
-この分離により、以下のメリットが得られます。
+- Kubernetes の Pod 配置の仕組み（Taint、Toleration、Affinity）
+- 運用ツールとアプリケーションを分けて配置する具体的な方法
+- なぜこの仕組みが必要なのか
+  :::
 
-- リソースの最適化とコスト削減
-- 運用の複雑さの軽減
-- ワークロード特性に応じた適切なノード管理
+## 前提知識：MNG と NodePool って何？
 
-## 前提知識
+本記事では、Kubernetes のサーバー（Node）を 2 種類に分けて管理します。初めての方向けに、それぞれの特徴を説明します。
 
-### Node への Pod スケジューリング制御方法
+### MNG（マネージドノードグループ）とは
 
-#### Affinity (Pod)
+```mermaid
+graph LR
+    AWS["☁️ AWS が管理"]
+    MNG["📦 MNG<br/>（マネージドノードグループ）"]
+    Features["✅ 安定稼働<br/>✅ シンプル管理<br/>❌ スケールが遅い"]
 
-- **対象**：Pod
-- **効果**：特定の Node へのスケジューリングを制限したり、優先させる
+    AWS --> MNG
+    MNG --> Features
 
-#### Taint (Node) と Toleration (Pod)
+    style MNG fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
+    style AWS fill:#fff3e0,stroke:#ff9800
+    style Features fill:#f1f8e9,stroke:#689f38
+```
 
-- **対象**：
-  - **Taint**：Node
-  - **Toleration**：Pod
-- **効果**：
-  - **Taint**：基本的に Pod のスケジューリングを拒否する（セキュリティゲートのイメージ）
-  - **Toleration**：Taint がついた Node へスケジュール可能にする（許可証のイメージ）
+**MNG の特徴**
 
-Taint と Toleration の組み合わせにより、「許可証（Toleration）を持つ Pod のみがセキュリティゲート（Taint）を通過できる」という制御が実現できます。
+| 項目           | 説明                                                   |
+| -------------- | ------------------------------------------------------ |
+| **管理者**     | AWS（または他のクラウドプロバイダー）が管理           |
+| **安定性**     | ✅ 高い。予測可能で安定したサーバー構成               |
+| **スケール**   | ❌ 遅い。サーバーの起動に数分かかる                    |
+| **コスト**     | 💰 一定。常に決まった数のサーバーが稼働               |
+| **設定の柔軟性** | ❌ 低い。細かい設定変更が難しい                        |
 
-### Pod のスケジュール方針
+**こんな用途に向いている**
 
-- **Operators Pod**：MNG（マネージドノードグループ）にのみ配置
-- **Services Pod**：NodePool（Karpenter）にのみ配置
+- 運用ツール（ArgoCD、Datadog など）
+- 常に動いている必要があるもの
+- 安定稼働が最優先のもの
 
-### Node 管理の特性
+---
 
-| Node 管理                       | YAML 管理 | Taint 付与 |
-| ------------------------------- | --------- | ---------- |
-| MNG（マネージドノードグループ） | 不可 ❌   | なし ❌    |
-| NodePool（Karpenter）           | 可能 ✅   | 付与 ✅    |
+### NodePool（Karpenter）とは
 
-### Pod 管理の特性
+```mermaid
+graph LR
+    Karpenter["⚙️ Karpenter が管理"]
+    NodePool["⚡ NodePool"]
+    Features["✅ 高速スケール<br/>✅ コスト最適化<br/>✅ 柔軟な設定"]
 
-| Pod 種類      | Toleration, Affinity 付与 | 備考                                               |
-| ------------- | ------------------------- | -------------------------------------------------- |
-| Operators Pod | なし ❌                   | Operator が増えるたびに個別設定が必要              |
-| Services Pod  | 付与 ✅                   | Deployment カスタムテンプレートで<br/>自動付与可能 |
+    Karpenter --> NodePool
+    NodePool --> Features
 
-## 配置戦略の全体像
+    style NodePool fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+    style Karpenter fill:#e8f5e9,stroke:#43a047
+    style Features fill:#f1f8e9,stroke:#689f38
+```
 
-### Node と Pod の管理方針
+**NodePool の特徴**
 
-| Node × Pod              | Node 管理     | Pod 管理                     | Pod 配置（スケジューリング）                                                                                                                                         |
-| ----------------------- | ------------- | ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| MNG × Operators Pod     | Taint なし ❌ | Toleration, Affinity なし ❌ | 制御なし（デフォルト配置）                                                                                                                                           |
-| NodePool × Services Pod | Taint 付与 ✅ | Toleration, Affinity 付与 ✅ | - Taint：Operators Pod → NodePool への配置をブロック<br/>- Toleration：Services Pod → NodePool への配置を許可<br/>- Affinity：Services Pod → NodePool への配置を限定 |
+| 項目           | 説明                                                     |
+| -------------- | -------------------------------------------------------- |
+| **管理者**     | Karpenter（Kubernetes 上で動くオートスケーラー）が管理  |
+| **安定性**     | ⚠️ 中程度。必要に応じてサーバーが増減する               |
+| **スケール**   | ✅ 速い。数秒〜数十秒でサーバーが起動                    |
+| **コスト**     | 💰💰 最適化。負荷に応じてサーバー数が増減               |
+| **設定の柔軟性** | ✅ 高い。YAML で細かく設定できる                         |
 
-### Pod のスケジューリング動作
+**こんな用途に向いている**
 
-#### Operators Pod の動き
+- アプリケーション（API、Web サーバーなど）
+- 負荷が変動するもの
+- コストを最適化したいもの
 
-- **方針**：MNG にのみスケジューリング
-- **スケジューリング**：
-  - → NodePool：NodePool の Taint でブロック ❌
-  - → MNG：デフォルトで配置 ✅
+---
 
-#### Services Pod の動き
-
-- **方針**：NodePool にのみスケジューリング
-- **スケジューリング**：
-  - → NodePool：Toleration で許可、Affinity で限定 ✅
-  - → MNG：Affinity によりスケジューリングされない ❌
-
-### アーキテクチャ図
+### MNG vs NodePool の比較
 
 ```mermaid
 graph TD
-    subgraph Pods ["Pod Type"]
-        direction LR
-        OpPod["<b>Operators Pod</b><br/>(ArgoCD, Datadog 等)<br/>[設定なし]"]
-        SvcPod["<b>Services Pod</b><br/>(アプリケーション)<br/>[Toleration 付与]<br/>[Affinity: NodePool 指定]"]
+    subgraph MNG["📦 MNG"]
+        M1["常に稼働"]
+        M2["安定性重視"]
+        M3["管理がシンプル"]
     end
 
-    subgraph Nodes ["Node Type"]
-        direction LR
-        MNG["<b>MNG</b><br/>(Managed Node Group)<br/>[Taint なし]"]
-        NP["<b>NodePool</b><br/>(Karpenter)<br/>[Taint: limited-to-service]"]
+    subgraph NodePool["⚡ NodePool"]
+        N1["負荷に応じて増減"]
+        N2["コスト最適化"]
+        N3["柔軟な設定"]
     end
 
-    OpPod ==>|"✅ デフォルト配置"| MNG
-    OpPod ---|"❌ 配置ブロック<br/>(Taint)"| NP
-
-    SvcPod -.->|"① 配置許可<br/>(Toleration)"| NP
-    SvcPod ==>|"② 配置限定<br/>(Affinity)"| NP
-    SvcPod ---|"❌ 配置しない<br/>(Affinity 効果)"| MNG
-
-    style NP stroke:#f66,stroke-width:2px,fill:#fff5f5
-    style MNG stroke:#333,stroke-dasharray: 5 5,fill:#f9f9f9
-    style SvcPod stroke:#01579b,stroke-width:2px,fill:#e3f2fd
-    style OpPod fill:#fff3e0
-    linkStyle 1 stroke:#f66,stroke-width:2px
-    linkStyle 3 stroke:#01579b,stroke-width:3px
-    linkStyle 4 stroke:#999,stroke-width:2px,stroke-dasharray: 5 5
+    style MNG fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
+    style NodePool fill:#fff3e0,stroke:#f57c00,stroke-width:2px
 ```
+
+| 特徴               | 📦 MNG                       | ⚡ NodePool（Karpenter）       |
+| ------------------ | ---------------------------- | ------------------------------ |
+| **スケール速度**   | ❌ 遅い（数分）              | ✅ 速い（数秒〜数十秒）        |
+| **コスト**         | 💰 一定                      | 💰💰 最適化（必要な分だけ）    |
+| **安定性**         | ✅ 高い                      | ⚠️ 中程度                      |
+| **設定の柔軟性**   | ❌ 低い                      | ✅ 高い                        |
+| **向いている用途** | 運用ツール、常駐プロセス     | アプリケーション、バッチ処理   |
+
+:::message info
+**Karpenter とは？**
+Karpenter は、Kubernetes クラスタのサーバー（Node）を自動で管理してくれるツールです。負荷に応じてサーバーを増やしたり減らしたりして、コストを最適化できます。
+:::
+
+---
+
+## やりたいこと：Pod を 2 種類のサーバーに分ける
+
+まず、やりたいことを図で見てみましょう。
+
+```mermaid
+graph LR
+    subgraph OperatorPods ["🛠️ 運用系 Pod"]
+        ArgoCD["ArgoCD"]
+        Datadog["Datadog"]
+        Other["その他運用ツール"]
+    end
+
+    subgraph ServicePods ["🚀 アプリケーション Pod"]
+        App1["API サーバー"]
+        App2["Web サーバー"]
+        App3["バッチ処理"]
+    end
+
+    subgraph MNG ["📦 MNG サーバー<br/>(安定重視)"]
+        M1["サーバー1"]
+        M2["サーバー2"]
+    end
+
+    subgraph NodePool ["⚡ NodePool サーバー<br/>(コスト最適化)"]
+        N1["サーバー1"]
+        N2["サーバー2"]
+        N3["サーバー3"]
+    end
+
+    ArgoCD --> M1
+    Datadog --> M1
+    Other --> M2
+
+    App1 --> N1
+    App2 --> N2
+    App3 --> N3
+
+    style MNG fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
+    style NodePool fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+    style OperatorPods fill:#f3e5f5,stroke:#7b1fa2
+    style ServicePods fill:#e8f5e9,stroke:#388e3c
+```
+
+### 目的
+
+| Pod の種類    | 配置先サーバー | 理由                               |
+| ------------- | -------------- | ---------------------------------- |
+| 🛠️ 運用系 Pod | MNG            | 安定稼働が重要。管理がシンプル。   |
+| 🚀 アプリ Pod | NodePool       | スケールしやすく、コストを最適化。 |
+
+### メリット
+
+- **コスト削減**：アプリは必要に応じてサーバー数を増減できる
+- **安定運用**：運用ツールは安定したサーバーで動かす
+- **管理しやすい**：役割が明確で運用がシンプル
+
+## 基礎知識：Pod 配置を制御する 3 つの仕組み
+
+Kubernetes には、Pod を配置する場所を制御する 3 つの仕組みがあります。
+
+### 1. Taint（テイント）：サーバー側の「立入禁止」看板
+
+```mermaid
+graph TD
+    Server["🖥️ サーバー<br/>（Node）"]
+    Sign["⛔ Taint<br/>「許可証がないと入れません」"]
+
+    Server --> Sign
+
+    style Server fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+    style Sign fill:#ffebee,stroke:#c62828,stroke-width:2px
+```
+
+**Taint とは**
+
+- サーバー（Node）に設定する「**立入禁止**」の看板
+- 基本的に Pod は配置できない
+- **許可証（Toleration）を持つ Pod だけ配置できる**
+
+**例え話**
+高級ホテルに「会員証がないと入れません」という看板があるイメージ。
+
+---
+
+### 2. Toleration（トレレーション）：Pod 側の「許可証」
+
+```mermaid
+graph TD
+    Pod["📦 Pod"]
+    Permit["🎫 Toleration<br/>「許可証を持っています」"]
+
+    Pod --> Permit
+
+    style Pod fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
+    style Permit fill:#e8f5e9,stroke:#388e3c,stroke-width:2px
+```
+
+**Toleration とは**
+
+- Pod に設定する「**許可証**」
+- Taint がついたサーバーに**入ることができる**
+- ただし、**必ずそこに配置されるわけではない**
+
+**例え話**
+会員証を持っていれば高級ホテルに入れるが、別の普通のホテルにも泊まれる。
+
+---
+
+### 3. Affinity（アフィニティ）：Pod 側の「希望・指定」
+
+```mermaid
+graph TD
+    Pod["📦 Pod"]
+    Preference["📍 Affinity<br/>「このサーバーに配置してください」"]
+
+    Pod --> Preference
+
+    style Pod fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
+    style Preference fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+```
+
+**Affinity とは**
+
+- Pod に設定する「**配置希望・指定**」
+- 「このサーバーに配置して」という意思表示
+- **強制力がある**（`required` の場合）
+
+**例え話**
+「海が見える部屋に泊まりたい」という希望を出すイメージ。
+
+---
+
+## 3 つの仕組みの組み合わせ
+
+この 3 つを組み合わせると、Pod を狙った場所に配置できます。
+
+| 仕組み            | 設定場所         | 役割                               |
+| ----------------- | ---------------- | ---------------------------------- |
+| ⛔ **Taint**      | サーバー（Node） | 「立入禁止」看板                   |
+| 🎫 **Toleration** | Pod              | 「許可証」（入ることができる）     |
+| 📍 **Affinity**   | Pod              | 「ここに配置して」（強制的に指定） |
+
+## 具体的な配置戦略
+
+さて、ここから具体的に「どう設定するか」を見ていきましょう。
+
+### 戦略の全体像
+
+```mermaid
+graph TD
+    subgraph Pods ["Pod の種類"]
+        OP["🛠️ 運用系 Pod<br/>（設定なし）"]
+        SP["🚀 アプリ Pod<br/>✅ Toleration 付き<br/>✅ Affinity 付き"]
+    end
+
+    subgraph Nodes ["サーバーの種類"]
+        MNG["📦 MNG<br/>（設定なし）"]
+        NP["⚡ NodePool<br/>⛔ Taint 付き"]
+    end
+
+    OP ==>|"✅ デフォルトで配置"| MNG
+    OP -.->|"❌ ブロックされる"| NP
+
+    SP ==>|"✅ 配置される"| NP
+    SP -.->|"❌ 配置されない"| MNG
+
+    style MNG fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
+    style NP fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+    style OP fill:#f3e5f5
+    style SP fill:#e8f5e9
+```
+
+### 設定内容の比較表
+
+| 対象                     | 設定内容                                 | 結果                      |
+| ------------------------ | ---------------------------------------- | ------------------------- |
+| 📦 **MNG サーバー**      | 設定なし                                 | 運用系 Pod が配置される   |
+| ⚡ **NodePool サーバー** | ⛔ **Taint 付与**                        | アプリ Pod のみ配置される |
+| 🛠️ **運用系 Pod**        | 設定なし                                 | MNG に配置される          |
+| 🚀 **アプリ Pod**        | 🎫 **Toleration** + 📍 **Affinity** 付与 | NodePool に配置される     |
+
+## 動作の仕組みを図で理解する
+
+### パターン 1：運用系 Pod の動き
+
+```mermaid
+flowchart TD
+    Start["🛠️ 運用系 Pod<br/>（ArgoCD, Datadog）"]
+    Check1{"NodePool に<br/>配置できる？"}
+    Check2{"MNG に<br/>配置できる？"}
+    Result1["❌ ブロック<br/>（Taint で拒否）"]
+    Result2["✅ 配置成功"]
+
+    Start --> Check1
+    Check1 -->|"Toleration なし"| Result1
+    Start --> Check2
+    Check2 -->|"制限なし"| Result2
+
+    style Start fill:#f3e5f5,stroke:#7b1fa2
+    style Result1 fill:#ffebee,stroke:#c62828
+    style Result2 fill:#e8f5e9,stroke:#388e3c
+```
+
+**運用系 Pod は MNG に配置される理由**
+
+1. NodePool には **Taint** がついている → 許可証（Toleration）がないので ❌ ブロック
+2. MNG には制限がない → ✅ そのまま配置される
+
+---
+
+### パターン 2：アプリ Pod の動き
+
+```mermaid
+flowchart TD
+    Start["🚀 アプリ Pod<br/>（API, Web サーバー）"]
+    Check1{"NodePool に<br/>配置できる？"}
+    Check2{"MNG に<br/>配置できる？"}
+    Result1["✅ 配置成功<br/>（Toleration で許可）"]
+    Result2["❌ 配置しない<br/>（Affinity で限定）"]
+
+    Start --> Check1
+    Check1 -->|"🎫 Toleration あり<br/>📍 Affinity 指定"| Result1
+    Start --> Check2
+    Check2 -->|"📍 Affinity で<br/>NodePool 限定"| Result2
+
+    style Start fill:#e8f5e9,stroke:#388e3c
+    style Result1 fill:#e8f5e9,stroke:#388e3c
+    style Result2 fill:#ffebee,stroke:#c62828
+```
+
+**アプリ Pod が NodePool に配置される理由**
+
+1. NodePool の **Taint** を **Toleration** で突破 → ✅ 入ることができる
+2. **Affinity** で NodePool を指定 → ✅ NodePool に限定される
+3. MNG には **Affinity** の効果で配置されない → ❌ ブロック
+
+---
+
+## Toleration と Affinity の役割の違い
+
+多くの人が混乱するポイントなので、図で整理しましょう。
+
+### Toleration だけだと…
+
+```mermaid
+graph LR
+    Pod["🚀 Pod<br/>（Toleration のみ）"]
+    NP["⚡ NodePool<br/>⛔ Taint 付き"]
+    MNG["📦 MNG<br/>（制限なし）"]
+
+    Pod -->|"✅ 入れる"| NP
+    Pod -->|"✅ こっちにも入れる"| MNG
+
+    style Pod fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
+    style NP fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+    style MNG fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
+```
+
+**問題点**
+
+- Toleration は「**入ることができる**」という許可証
+- でも「**そこに行く**」とは限らない
+- MNG にも配置される可能性がある
+
+---
+
+### Toleration + Affinity だと…
+
+```mermaid
+graph LR
+    Pod["🚀 Pod<br/>（Toleration + Affinity）"]
+    NP["⚡ NodePool<br/>⛔ Taint 付き"]
+    MNG["📦 MNG<br/>（制限なし）"]
+
+    Pod ==>|"✅ ここに行く"| NP
+    Pod -.->|"❌ 行かない"| MNG
+
+    style Pod fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
+    style NP fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+    style MNG fill:#e3f2fd,stroke:#1976d2,stroke-width:2px,stroke-dasharray: 5 5
+```
+
+**解決**
+
+- **Toleration**：NodePool に「**入れる**」
+- **Affinity**：NodePool に「**行く**」ように指定
+- MNG には配置されない
+
+### 役割の比較表
+
+| 仕組み         | 役割                                | 例え                           |
+| -------------- | ----------------------------------- | ------------------------------ |
+| 🎫 Toleration  | 「入ることができる」（許可）        | 会員証を持っている             |
+| 📍 Affinity    | 「そこに行く」（指定・強制）        | 「この部屋に泊まる」と予約する |
+| 両方組み合わせ | 「入れる」+「そこに行く」= 確実配置 | 会員証を持って部屋を予約する   |
+
+---
 
 ## 実装方法
 
-### NodePool の設定（Taint の付与）
+それでは、実際の設定方法を見ていきましょう。
 
-NodePool に Taint を付与することで、Toleration を持たない Operators Pod のスケジューリングをブロックします。
+### Step 1：NodePool に Taint を付与（サーバー側）
+
+まず、NodePool サーバーに「立入禁止」の看板（Taint）を設置します。
 
 ```yaml
-# NodePool 定義
+# NodePool の定義
 apiVersion: karpenter.sh/v1beta1
 kind: NodePool
 metadata:
@@ -136,95 +447,249 @@ metadata:
 spec:
   template:
     spec:
-      # Taint を付与し、Services Pod 専用にする
+      # ⛔ Taint を付与（立入禁止の看板）
       taints:
-        - key: "limited-to-service"
-          # value は任意（オプション）
-          # key のみで十分な場合は省略可能
-          # value: "true"
-          effect: "NoSchedule"
+        - key: "limited-to-service" # 看板の名前
+          effect: "NoSchedule" # 効果：スケジュール禁止
 
-      # NodePool であることを識別するラベル
       nodeClassRef:
         name: default
 ```
 
-### Services Pod の設定（Toleration と Affinity）
+**この設定の効果**
 
-Services Pod に以下の設定を付与します。
+- `limited-to-service` という名前の Taint を付与
+- `NoSchedule` = 「この Taint を許可する Toleration がない Pod は配置しない」
+- 結果：**運用系 Pod は配置できない**
+
+---
+
+### Step 2：アプリ Pod に Toleration と Affinity を付与（Pod 側）
+
+次に、アプリ Pod に「許可証」（Toleration）と「配置希望」（Affinity）を設定します。
 
 ```yaml
-# Deployment 定義
+# Deployment の定義
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: example-service
+  name: my-app
 spec:
   template:
     spec:
-      # Toleration: NodePool の Taint を許可
+      # 🎫 Toleration（許可証）
       tolerations:
-        - key: "limited-to-service"
-          operator: "Exists"
-          # Taint に value がある場合は合わせる
-          # value: "true"
-          effect: "NoSchedule"
+        - key: "limited-to-service" # NodePool の Taint と同じ名前
+          operator: "Exists" # key が存在すればOK
+          effect: "NoSchedule" # NodePool の Taint と同じ効果
 
-      # Affinity: NodePool への配置を限定
+      # 📍 Affinity（配置指定）
       affinity:
         nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
+          requiredDuringSchedulingIgnoredDuringExecution: # 必須条件
             nodeSelectorTerms:
               - matchExpressions:
-                  # Karpenter NodePool のラベルを指定
-                  - key: "karpenter.sh/nodepool"
-                    operator: "Exists"
+                  - key: "karpenter.sh/nodepool" # NodePool のラベル
+                    operator: "Exists" # このラベルがあるサーバーに配置
 ```
 
-### スケジューリングの動作説明
+**この設定の効果**
 
-#### Toleration の役割
+1. **Toleration**
+   - `limited-to-service` という Taint を許可
+   - → NodePool に「**入れる**」ようになる
+2. **Affinity**
+   - `karpenter.sh/nodepool` ラベルがあるサーバーを指定
+   - → NodePool に「**行く**」ように指定
+   - → MNG には配置されない
 
-Toleration は「NodePool にスケジュール**可能**にする」だけです。必ず NodePool に配置されるわけではありません。
+---
 
-```yaml
-tolerations:
-  - key: "limited-to-service"
-    operator: "Exists"
-    effect: "NoSchedule"
+### 設定後の動作フロー
+
+```mermaid
+sequenceDiagram
+    participant Scheduler as Kubernetes<br/>スケジューラー
+    participant MNG as 📦 MNG
+    participant NP as ⚡ NodePool
+
+    Note over Scheduler: 🛠️ 運用系 Pod を配置
+    Scheduler->>NP: NodePool に配置できる？
+    NP-->>Scheduler: ❌ Taint でブロック
+    Scheduler->>MNG: MNG に配置できる？
+    MNG-->>Scheduler: ✅ OK
+    Note over MNG: 運用系 Pod 配置
+
+    Note over Scheduler: 🚀 アプリ Pod を配置
+    Scheduler->>NP: NodePool に配置できる？
+    NP-->>Scheduler: ✅ Toleration があるので OK
+    Note over Scheduler: Affinity で NodePool 指定
+    Scheduler->>MNG: MNG には配置しない
+    Note over NP: アプリ Pod 配置
 ```
 
-この設定により、Services Pod は Taint のついた NodePool へのスケジューリングが許可されます。
+---
 
-#### Affinity の役割
+## 設定のまとめ
 
-Affinity は「NodePool に**限定**する」役割を果たします。これにより、Services Pod が MNG にスケジューリングされることを防ぎます。
+最後に、全体の設定を表で整理します。
 
-```yaml
-affinity:
-  nodeAffinity:
-    requiredDuringSchedulingIgnoredDuringExecution:
-      nodeSelectorTerms:
-        - matchExpressions:
-            - key: "karpenter.sh/nodepool"
-              operator: "Exists"
+### サーバー側の設定
+
+| サーバー種類 | Taint 設定                  | 効果                      |
+| ------------ | --------------------------- | ------------------------- |
+| 📦 MNG       | なし                        | 運用系 Pod が配置される   |
+| ⚡ NodePool  | `limited-to-service` を付与 | アプリ Pod のみ配置される |
+
+### Pod 側の設定
+
+| Pod 種類      | Toleration 設定             | Affinity 設定   | 配置先   |
+| ------------- | --------------------------- | --------------- | -------- |
+| 🛠️ 運用系 Pod | なし                        | なし            | MNG      |
+| 🚀 アプリ Pod | `limited-to-service` を許可 | NodePool を指定 | NodePool |
+
+### 配置ルールの全体図
+
+```mermaid
+graph TD
+    subgraph "設定内容"
+        S1["📦 MNG<br/>Taint なし"]
+        S2["⚡ NodePool<br/>⛔ Taint: limited-to-service"]
+        P1["🛠️ 運用系 Pod<br/>設定なし"]
+        P2["🚀 アプリ Pod<br/>🎫 Toleration: limited-to-service<br/>📍 Affinity: NodePool 指定"]
+    end
+
+    subgraph "配置結果"
+        R1["運用系 Pod → MNG"]
+        R2["アプリ Pod → NodePool"]
+    end
+
+    P1 --> R1
+    P2 --> R2
+    S1 --> R1
+    S2 --> R2
+
+    style S1 fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
+    style S2 fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+    style P1 fill:#f3e5f5,stroke:#7b1fa2
+    style P2 fill:#e8f5e9,stroke:#388e3c
+    style R1 fill:#e3f2fd,stroke:#1976d2,stroke-width:3px
+    style R2 fill:#fff3e0,stroke:#f57c00,stroke-width:3px
 ```
 
-この設定により、Services Pod は `karpenter.sh/nodepool` ラベルを持つ Node（NodePool）にのみスケジューリングされます。
+---
+
+## よくある質問
+
+### Q1: Toleration だけじゃダメなの?
+
+**A:** ダメです。
+
+Toleration は「**入れる**」だけで、「**そこに行く**」とは限りません。
+
+```mermaid
+graph LR
+    Pod["Pod<br/>（Toleration のみ）"]
+    NP["NodePool"]
+    MNG["MNG"]
+
+    Pod -->|"入れる"| NP
+    Pod -->|"こっちにも入れる"| MNG
+
+    style NP fill:#fff3e0
+    style MNG fill:#e3f2fd
+```
+
+**Affinity を追加すると**
+
+```mermaid
+graph LR
+    Pod["Pod<br/>（Toleration + Affinity）"]
+    NP["NodePool"]
+    MNG["MNG"]
+
+    Pod ==>|"ここに行く"| NP
+    Pod -.->|"行かない"| MNG
+
+    style NP fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+    style MNG fill:#e3f2fd,stroke:#1976d2,stroke-dasharray: 5 5
+```
+
+---
+
+### Q2: Affinity だけじゃダメなの?
+
+**A:** ダメです。
+
+NodePool に Taint がついているので、Toleration がないと「**入れない**」です。
+
+```mermaid
+graph LR
+    Pod["Pod<br/>（Affinity のみ）"]
+    NP["NodePool<br/>⛔ Taint"]
+
+    Pod -.->|"❌ ブロック"| NP
+
+    style NP fill:#ffebee,stroke:#c62828,stroke-width:2px
+```
+
+---
+
+### Q3: 運用系 Pod に Toleration をつけたらどうなる?
+
+**A:** NodePool にも配置される可能性があります。
+
+```mermaid
+graph LR
+    Pod["運用系 Pod<br/>（Toleration 付き）"]
+    NP["NodePool"]
+    MNG["MNG"]
+
+    Pod -->|"✅"| NP
+    Pod -->|"✅"| MNG
+
+    style NP fill:#fff3e0
+    style MNG fill:#e3f2fd
+```
+
+**Affinity がないので、どちらにも配置される可能性があります。**
+
+運用系 Pod は MNG に固定したいので、**何も設定しない**のが正解です。
+
+---
 
 ## まとめ
 
-本記事では、Taint/Toleration と Affinity を組み合わせた Pod 配置戦略について解説しました。
+本記事では、Kubernetes で Pod を狙った場所に配置する方法を図解しました。
 
-**ポイント**：
+### ポイントのおさらい
 
-- **NodePool に Taint を付与**：Operators Pod の侵入をブロック
-- **Services Pod に Toleration を付与**：NodePool へのスケジューリングを許可
-- **Services Pod に Affinity を付与**：NodePool への配置を限定し、MNG への配置を防止
+| 仕組み            | 設定場所 | 役割                       | 例え               |
+| ----------------- | -------- | -------------------------- | ------------------ |
+| ⛔ **Taint**      | サーバー | 「立入禁止」看板           | 「会員限定」の看板 |
+| 🎫 **Toleration** | Pod      | 「許可証」（入れる）       | 会員証             |
+| 📍 **Affinity**   | Pod      | 「配置指定」（そこに行く） | 部屋の予約         |
 
-この方法により、Operators Pod と Services Pod を明確に分離し、ワークロード特性に応じた適切なノード管理が実現できます。
+### 実装の流れ
 
-カスタムテンプレートを活用することで、新規サービスにも自動的にこの配置戦略が適用され、運用負荷を軽減できます。
+1. **NodePool に Taint 付与** → 運用系 Pod の侵入をブロック
+2. **アプリ Pod に Toleration 付与** → NodePool に入れるようにする
+3. **アプリ Pod に Affinity 付与** → NodePool に行くように指定
+
+### 最終的な配置
+
+```mermaid
+graph TD
+    OP["🛠️ 運用系 Pod"] ==> MNG["📦 MNG"]
+    SP["🚀 アプリ Pod"] ==> NP["⚡ NodePool"]
+
+    style MNG fill:#e3f2fd,stroke:#1976d2,stroke-width:3px
+    style NP fill:#fff3e0,stroke:#f57c00,stroke-width:3px
+    style OP fill:#f3e5f5
+    style SP fill:#e8f5e9
+```
+
+この方法を使えば、Pod を意図した場所に確実に配置でき、コスト削減と安定運用を両立できます。
 
 ## 参考資料
 
