@@ -3,7 +3,7 @@ title: "【図解】Kubernetes で Pod を狙った場所に配置する方法 -
 emoji: "🎯"
 type: "tech"
 topics: ["kubernetes", "karpenter", "eks", "devops", "初心者"]
-published: false
+published: true
 ---
 
 ## はじめに

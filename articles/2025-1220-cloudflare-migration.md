@@ -3,7 +3,7 @@ title: "初心者でもわかる！Cloudflare R2 で大容量ファイル配信�
 emoji: "☁️"
 type: "tech"
 topics: ["cloudflare", "aws", "インフラ", "初心者", "コスト削減"]
-published: false
+published: true
 ---
 
 # はじめに

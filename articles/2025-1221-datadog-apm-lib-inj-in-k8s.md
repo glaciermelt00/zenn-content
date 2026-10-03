@@ -3,7 +3,7 @@ title: "Kubernetes での APM ライブラリ自動注入：初心者でもわ�
 emoji: "🔍"
 type: "tech"
 topics: ["kubernetes", "apm", "observability", "monitoring"]
-published: false
+published: true
 ---
 
 # はじめに

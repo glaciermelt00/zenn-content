@@ -3,7 +3,7 @@ title: "Go 文法 Tips"
 emoji: "😸"
 type: "tech" # tech: 技術記事 / idea: アイデア
 topics: ["Go", "Golang"]
-published: false
+published: true
 ---
 
 # 背景

@@ -4,7 +4,7 @@ emoji: "💪"
 type: "idea"
 topics:
   ["キャリア", "エンジニア転職", "プログラミング初心者", "メンタリング", "AI"]
-published: false
+published: true
 ---
 
 # はじめに
